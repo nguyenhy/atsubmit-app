@@ -1,11 +1,12 @@
-import './assets/main.css'
+import "./assets/main.css";
+import { mount } from "./utils/view/mount";
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
+const run = async () => {
+    const $app = document.querySelector("#app");
+    if ($app instanceof HTMLDivElement) {
+        const pathname = window.location.pathname;
+        await mount($app, pathname);
+    }
+};
 
-const app = createApp(App)
-
-app.use(router)
-
-app.mount('#app')
+run().catch(console.error);

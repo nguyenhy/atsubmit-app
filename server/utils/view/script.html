@@ -1,0 +1,36 @@
+<script>
+	const loadScript = (src) => {
+		const script = document.createElement('script');
+		script.type = 'module';
+		script.crossorigin = true;
+		script.src = src;
+		document.head.insertAdjacentElement(
+			'beforeend',
+			script
+		);
+	};
+
+	const loadStyle = (src) => {
+		const link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.crossorigin = true;
+		link.href = src;
+		document.head.insertAdjacentElement('beforeend', link);
+	};
+
+	window.onload = async () => {
+		const response = await fetch('/.vite/manifest.json');
+		const json = await response.json();
+		const key = '{{VIEW_NAME}}';
+		const object = json[key] || null;
+
+		if (object) {
+			if (object.css) {
+				object.css.map(loadStyle);
+			}
+			if (object.file) {
+				loadScript(object.file);
+			}
+		}
+	};
+</script>
