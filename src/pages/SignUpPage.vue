@@ -32,11 +32,18 @@ const agreed = ref(false);
             <div class="grow h-px bg-gray-400"></div>
         </div>
 
-        <form @submit.prevent>
+        <form
+            @submit.prevent
+            action="/signup"
+            method="POST"
+            :disabled="!agreed"
+        >
             <InputField
                 label="Email Address"
                 :icon="Mail"
                 :input="{
+                    id: 'email',
+                    name: 'email',
                     type: 'email',
                     placeholder: 'name@example.com',
                     autocomplete: 'email',
@@ -47,6 +54,8 @@ const agreed = ref(false);
                 label="Password"
                 :icon="Lock"
                 :input="{
+                    id: 'password',
+                    name: 'password',
                     type: 'password',
                     placeholder: '••••••••',
                     autocomplete: 'new-password',
@@ -57,6 +66,8 @@ const agreed = ref(false);
                 label="Confirm Password"
                 :icon="Lock"
                 :input="{
+                    id: 'confirm-password',
+                    name: 'confirm-password',
                     type: 'password',
                     placeholder: '••••••••',
                     autocomplete: 'new-password',
@@ -88,7 +99,9 @@ const agreed = ref(false);
                 </label>
             </div>
 
-            <PrimaryButton class="w-full py-2.5 mb-6"> Sign up </PrimaryButton>
+            <PrimaryButton class="w-full py-2.5 mb-6" :disabled="!agreed">
+                Sign up
+            </PrimaryButton>
         </form>
 
         <p class="text-center text-sm text-muted-foreground">

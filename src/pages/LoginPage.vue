@@ -14,7 +14,7 @@
             <div class="grow h-px bg-gray-400"></div>
         </div>
 
-        <form @submit.prevent>
+        <form @submit.prevent action="/login" method="POST">
             <InputField
                 label="Email Address"
                 :icon="Mail"
