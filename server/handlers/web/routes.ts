@@ -209,6 +209,33 @@ export const registerWebRoutes = (web: WebHono) => {
 
         return c.redirect("/reset-password-success");
     });
+
+    const dashboard = web.basePath("/dashboard");
+    dashboard.use("*", sessionRequiredMiddleware("/login"));
+    dashboard.get("/", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
+    dashboard.get("/forms", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
+    dashboard.get("/submissions", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
+    dashboard.get("/settings", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
+    dashboard.get("/settings/profile", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
+    dashboard.get("/settings/processing", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
+    dashboard.get("/settings/domains", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
+    dashboard.get("/settings/notifications", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
 };
 
 export const registerWebApiRoutes = (webApi: WebApiHono) => {};

@@ -25,6 +25,8 @@ export const ResetPasswordSuccessLoader = () =>
 export const ResetPasswordUsedLoader = () =>
     import("@/loaders/ResetPasswordUsedLoader.vue");
 
+const DashboardLoader = () => import("@/loaders/DashboardLoader.vue");
+
 export const HTTP_STATUS_MAP: Record<string, AsyncComponentLoader> = {
     "404": Error404ViewAsyncLoader,
     "500": Error500ViewAsyncLoader,
@@ -44,4 +46,6 @@ export const PATH_MAP: Record<string, AsyncComponentLoader> = {
     "reset-password": ResetPasswordLoader,
     "reset-password-used": ResetPasswordUsedLoader,
     "reset-password-success": ResetPasswordSuccessLoader,
+
+    dashboard: DashboardLoader,
 };
