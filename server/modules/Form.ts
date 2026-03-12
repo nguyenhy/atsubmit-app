@@ -1,18 +1,22 @@
 import type { Timestamp, UUID } from "@server/modules/Fields";
 
 export interface Form {
-  id: UUID;
+    id: UUID;
 
-  user_id: UUID;
+    user_id: UUID;
 
-  name: string;
+    name: string;
 
-  endpoint_slug: string;
+    endpoint_slug: string;
 
-  notification_email: string | null;
+    submit_token: string;
 
-  is_active: boolean;
+    allowed_domains: string[];
 
-  created_at: Timestamp;
-  updated_at: Timestamp;
+    notification_email: string | null;
+
+    is_active: boolean;
+
+    created_at: Timestamp;
+    updated_at: Timestamp;
 }

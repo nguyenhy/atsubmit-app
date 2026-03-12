@@ -22,6 +22,7 @@ import PrimaryButton from "@/components/buttons/PrimaryButton.vue";
                     placeholder: 'name@example.com',
                     autocomplete: 'email',
                 }"
+                class="space-y-2 mb-4"
             />
 
             <PrimaryButton class="w-full py-2.5 mb-6">

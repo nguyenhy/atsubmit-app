@@ -1,5 +1,5 @@
 <template>
-    <div class="space-y-2 mb-4">
+    <div>
         <label class="text-sm font-medium text-foreground" :for="input?.id">
             {{ label }}
         </label>
@@ -16,7 +16,14 @@
             </div>
 
             <!-- input -->
-            <slot>
+            <slot
+                :classese="[
+                    'w-full py-2.5 rounded-lg bg-muted border border-border focus:outline-none focus:ring-2 focus:ring-apple-blue/50 transition-all',
+                    $slots.prepend || icon ? 'pl-10' : 'pl-4',
+                    $slots.append ? 'pr-10' : 'pr-4',
+                ]"
+                :input="input"
+            >
                 <input
                     v-bind="input"
                     class="w-full py-2.5 rounded-lg bg-muted border border-border focus:outline-none focus:ring-2 focus:ring-apple-blue/50 transition-all"

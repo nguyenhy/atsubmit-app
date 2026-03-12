@@ -20,11 +20,24 @@ import {
     emailSignupService,
     verifyCanSignUpWithEmail,
 } from "@server/modules/Authentication/SignUpService";
+import { honeypotSettingBodyService } from "@server/modules/DashboardProcessingSettings/HoneypotSettingsBodyService";
+import { getAccountHoneypotFormSetting } from "@server/modules/DashboardProcessingSettings/HoneypotSettingsService";
+import { validateProfileInfoBodyService } from "@server/modules/DashboardProfileSettings/ProfileInfoBodyService";
+import {
+    getProfileInfo,
+    upsertProfileInfo,
+    upsertUserHoneyPotSetting,
+} from "@server/modules/DashboardProfileSettings/ProfileInfoService";
+import { SUPPORTED_TIMEZONE_OPTIONS } from "@server/modules/DashboardProfileSettings/SupportedTimezone";
 import { deleteSessionCookie } from "@server/modules/Session/CookieService";
-import { deleteSessionService } from "@server/modules/Session/SessionService";
+import {
+    deleteSessionService,
+    getSessionService,
+} from "@server/modules/Session/SessionService";
 import { saveUserSessionService } from "@server/modules/Session/UserSessionService";
 import { WebHono, WebApiHono } from "@server/types";
 import { htmlPage } from "@server/utils/view";
+import { zodErrorsToJson } from "@server/utils/zod/error";
 import { randomBytes } from "node:crypto";
 
 export const registerWebRoutes = (web: WebHono) => {
@@ -225,11 +238,137 @@ export const registerWebRoutes = (web: WebHono) => {
         return c.html(htmlPage(c, {}));
     });
     dashboard.get("/settings/profile", async (c) => {
-        return c.html(htmlPage(c, {}));
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const info = await getProfileInfo(c, session.user_email);
+
+        return c.html(
+            htmlPage(c, {
+                context: {
+                    name: info?.display_name || "",
+                    email: info?.email || session.user_email,
+                    timezones: SUPPORTED_TIMEZONE_OPTIONS,
+                    timezone: info?.timezone || "",
+                },
+            }),
+        );
     });
+    dashboard.post(
+        "/settings/profile",
+        validateProfileInfoBodyService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const form = c.req.valid("form");
+            if (!form.error) {
+                await upsertProfileInfo(c, {
+                    user_id: session.user_id,
+                    name: form.data.name,
+                    timezone: form.data.timezone,
+                });
+            }
+
+            const info = await getProfileInfo(c, session.user_email);
+            return c.html(
+                htmlPage(c, {
+                    context: {
+                        name: info?.display_name || "",
+                        email: info?.email || session.user_email,
+                        timezones: SUPPORTED_TIMEZONE_OPTIONS,
+                        timezone: info?.timezone || "",
+                        error: form.error
+                            ? zodErrorsToJson(form.error)
+                            : undefined,
+                    },
+                }),
+            );
+        },
+    );
+
     dashboard.get("/settings/processing", async (c) => {
-        return c.html(htmlPage(c, {}));
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const setting = await getAccountHoneypotFormSetting(
+            c,
+            session.user_email,
+        );
+        return c.html(
+            htmlPage(c, {
+                context: {
+                    enabled: !!setting.default_honeypot_enabled,
+                    name: setting.default_honeypot_input_name,
+                    hiddenStyle: setting.default_honeypot_hidden_style,
+                    hiddenClassName: setting.default_honeypot_class_name || "",
+                },
+            }),
+        );
     });
+    dashboard.post(
+        "/settings/processing",
+        honeypotSettingBodyService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const form = c.req.valid("form");
+            if (!form.error) {
+                await upsertUserHoneyPotSetting(c, {
+                    user_id: session.user_id,
+                    enabled: form.data.enabled,
+                    name: form.data.name,
+                    hiddenStyle: form.data.hiddenStyle,
+                    hiddenClassName: form.data.hiddenClassName,
+                });
+            }
+
+            const setting = await getAccountHoneypotFormSetting(
+                c,
+                session.user_email,
+            );
+            return c.html(
+                htmlPage(c, {
+                    context: {
+                        enabled: !!setting.default_honeypot_enabled,
+                        name: setting.default_honeypot_input_name,
+                        hiddenStyle: setting.default_honeypot_hidden_style,
+                        hiddenClassName:
+                            setting.default_honeypot_class_name || "",
+                    },
+                }),
+            );
+        },
+    );
     dashboard.get("/settings/domains", async (c) => {
         return c.html(htmlPage(c, {}));
     });

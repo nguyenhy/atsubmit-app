@@ -47,6 +47,7 @@ const { msg, errors } = useFormError(props.error);
                     autocomplete: 'new-password',
                 }"
                 :error="errors.password"
+                class="space-y-2 mb-4"
             >
                 <template #append>
                     <button type="button" @click="showPass = !showPass">
@@ -67,6 +68,7 @@ const { msg, errors } = useFormError(props.error);
                     autocomplete: 'new-password',
                 }"
                 :error="errors['confirm-password']"
+                class="space-y-2 mb-4"
             >
                 <template #append>
                     <button type="button" @click="showPass = !showPass">

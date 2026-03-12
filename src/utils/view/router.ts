@@ -26,6 +26,14 @@ export const ResetPasswordUsedLoader = () =>
     import("@/loaders/ResetPasswordUsedLoader.vue");
 
 const DashboardLoader = () => import("@/loaders/DashboardLoader.vue");
+const DashboardSettingsLoader = () =>
+    import("@/loaders/DashboardProfileSettingsLoader.vue");
+const DashboardProcessingSettingsLoader = () =>
+    import("@/loaders/DashboardProcessingSettingsLoader.vue");
+const DashboardDomainsSettingsLoader = () =>
+    import("@/loaders/DashboardDomainSettingsLoader.vue");
+const DashboardNotificationsSettingsLoader = () =>
+    import("@/loaders/DashboardNotificationSettingsLoader.vue");
 
 export const HTTP_STATUS_MAP: Record<string, AsyncComponentLoader> = {
     "404": Error404ViewAsyncLoader,
@@ -48,4 +56,10 @@ export const PATH_MAP: Record<string, AsyncComponentLoader> = {
     "reset-password-success": ResetPasswordSuccessLoader,
 
     dashboard: DashboardLoader,
+
+    "dashboard/settings": DashboardSettingsLoader,
+    "dashboard/settings/profile": DashboardSettingsLoader,
+    "dashboard/settings/processing": DashboardProcessingSettingsLoader,
+    "dashboard/settings/domains": DashboardDomainsSettingsLoader,
+    "dashboard/settings/notifications": DashboardNotificationsSettingsLoader,
 };

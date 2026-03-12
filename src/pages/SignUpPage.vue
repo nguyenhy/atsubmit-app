@@ -55,6 +55,7 @@ const { msg, errors } = useFormError(props.error, { isMsgFields: ["agree"] });
                     required: true,
                 }"
                 :error="errors.email"
+                class="space-y-2 mb-4"
             />
 
             <InputField
@@ -69,6 +70,7 @@ const { msg, errors } = useFormError(props.error, { isMsgFields: ["agree"] });
                     required: true,
                 }"
                 :error="errors.password"
+                class="space-y-2 mb-4"
             />
 
             <InputField
@@ -83,6 +85,7 @@ const { msg, errors } = useFormError(props.error, { isMsgFields: ["agree"] });
                     required: true,
                 }"
                 :error="errors['confirm-password']"
+                class="space-y-2 mb-4"
             />
 
             <div

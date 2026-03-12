@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRoute } from "vue-router";
 import {
     LayoutDashboard,
     Inbox,
@@ -16,7 +15,6 @@ import {
 } from "lucide-vue-next";
 import Layout from "@/layouts/Base.vue";
 
-const route = useRoute();
 
 const isSidebarCollapsed = ref(false);
 const isMobileMenuOpen = ref(false);
@@ -54,8 +52,11 @@ const navigation = [
 ];
 
 function isActive(path: string) {
-    const currentPath = location.pathname;
-    return currentPath === path || currentPath.startsWith(path + "/");
+    return location.pathname === path;
+}
+
+function isParentActive(path: string) {
+    return location.pathname.startsWith(path + "/");
 }
 </script>
 
@@ -118,7 +119,7 @@ function isActive(path: string) {
                         :href="item.href"
                         class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group"
                         :class="
-                            isActive(item.href)
+                            isActive(item.href) || isParentActive(item.href)
                                 ? 'bg-apple-blue/10 text-apple-blue'
                                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                         "
@@ -132,9 +133,10 @@ function isActive(path: string) {
 
                     <div
                         v-if="
-                            !isSidebarCollapsed &&
-                            item.children &&
-                            isActive(item.href)
+                            (!isSidebarCollapsed &&
+                                item.children &&
+                                isActive(item.href)) ||
+                            isParentActive(item.href)
                         "
                         class="ml-9 mt-1 space-y-1"
                     >
@@ -144,7 +146,7 @@ function isActive(path: string) {
                             :href="child.href"
                             class="block px-3 py-1.5 text-sm rounded-lg"
                             :class="
-                                route.path === child.href
+                                isParentActive(child.href)
                                     ? 'text-apple-blue font-medium'
                                     : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                             "
@@ -186,7 +188,7 @@ function isActive(path: string) {
                             :href="item.href"
                             class="flex items-center gap-3 p-2 rounded-lg"
                             :class="
-                                isActive(item.href)
+                                isActive(item.href) || isParentActive(item.href)
                                     ? 'bg-apple-blue/10 text-apple-blue'
                                     : ''
                             "

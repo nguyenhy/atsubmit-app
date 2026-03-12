@@ -10,6 +10,8 @@ CREATE TABLE forms (
     name VARCHAR(255) NOT NULL,
 
     endpoint_slug VARCHAR(100) UNIQUE NOT NULL,
+    submit_token TEXT NOT NULL,
+    allowed_domains TEXT[] NOT NULL,
 
     notification_email VARCHAR(255),
 

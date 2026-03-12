@@ -28,6 +28,7 @@
                     required: true,
                 }"
                 :error="errors.email"
+                class="space-y-2 mb-4"
             />
 
             <InputField
@@ -42,6 +43,7 @@
                     required: true,
                 }"
                 :error="errors.password"
+                class="space-y-2 mb-4"
             />
 
             <div class="flex items-center justify-between mb-6">
