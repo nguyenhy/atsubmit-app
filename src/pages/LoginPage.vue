@@ -14,7 +14,8 @@
             <div class="grow h-px bg-gray-400"></div>
         </div>
 
-        <form @submit.prevent action="/login" method="POST">
+        <InputFieldError v-if="msg" :error="msg" class="mt-4" />
+        <form action="/login" method="POST">
             <InputField
                 label="Email Address"
                 :icon="Mail"
@@ -24,7 +25,9 @@
                     type: 'email',
                     placeholder: 'name@example.com',
                     autocomplete: 'email',
+                    required: true,
                 }"
+                :error="errors.email"
             />
 
             <InputField
@@ -36,7 +39,9 @@
                     type: 'password',
                     placeholder: '••••••••',
                     autocomplete: 'current-password',
+                    required: true,
                 }"
+                :error="errors.password"
             />
 
             <div class="flex items-center justify-between mb-6">
@@ -83,6 +88,13 @@ import { Mail, Lock } from "lucide-vue-next";
 import PrimaryButton from "@/components/buttons/PrimaryButton.vue";
 import { siFacebook } from "simple-icons";
 import SimpleIconSvg from "@/components/SimpleIconSvg.vue";
+import InputFieldError from "@/components/InputFieldError.vue";
+import { useFormError } from "@/composition/useFormError";
 
-console.log(typeof siFacebook, siFacebook);
+const props = defineProps<{
+    email: string;
+    error?: string | string[];
+}>();
+
+const { msg, errors } = useFormError(props.error);
 </script>

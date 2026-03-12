@@ -37,7 +37,9 @@ defineProps<{
                     {{ description }}
                 </p>
 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <div
+                    class="flex flex-col items-center sm:flex-row gap-4 justify-center"
+                >
                     <a href="/">
                         <PrimaryButton
                             class="flex items-center gap-2 justify-center"

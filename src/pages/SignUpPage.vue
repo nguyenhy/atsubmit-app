@@ -9,8 +9,17 @@ import { Mail, Lock } from "lucide-vue-next";
 import { siFacebook } from "simple-icons";
 import PrimaryButton from "@/components/buttons/PrimaryButton.vue";
 import SimpleIconSvg from "@/components/SimpleIconSvg.vue";
+import { useFormError } from "@/composition/useFormError";
+import InputFieldError from "@/components/InputFieldError.vue";
 
 const agreed = ref(false);
+
+const props = defineProps<{
+    email: string;
+    error?: string | string[];
+}>();
+
+const { msg, errors } = useFormError(props.error, { isMsgFields: ["agree"] });
 </script>
 
 <template>
@@ -32,12 +41,8 @@ const agreed = ref(false);
             <div class="grow h-px bg-gray-400"></div>
         </div>
 
-        <form
-            @submit.prevent
-            action="/signup"
-            method="POST"
-            :disabled="!agreed"
-        >
+        <InputFieldError v-if="msg" :error="msg" class="mt-4" />
+        <form action="/signup" method="POST">
             <InputField
                 label="Email Address"
                 :icon="Mail"
@@ -47,7 +52,9 @@ const agreed = ref(false);
                     type: 'email',
                     placeholder: 'name@example.com',
                     autocomplete: 'email',
+                    required: true,
                 }"
+                :error="errors.email"
             />
 
             <InputField
@@ -59,7 +66,9 @@ const agreed = ref(false);
                     type: 'password',
                     placeholder: '••••••••',
                     autocomplete: 'new-password',
+                    required: true,
                 }"
+                :error="errors.password"
             />
 
             <InputField
@@ -71,16 +80,23 @@ const agreed = ref(false);
                     type: 'password',
                     placeholder: '••••••••',
                     autocomplete: 'new-password',
+                    required: true,
                 }"
+                :error="errors['confirm-password']"
             />
 
-            <div class="flex items-start gap-2 mb-6">
+            <div
+                class="flex items-start gap-2"
+                :class="{
+                    'mb-6': !errors.agree,
+                }"
+            >
                 <input
+                    name="agree"
                     type="checkbox"
                     v-model="agreed"
                     class="mt-1 rounded border-border text-apple-blue focus:ring-apple-blue"
                 />
-
                 <label class="text-sm text-muted-foreground leading-tight">
                     I agree to the
                     <a
@@ -98,10 +114,15 @@ const agreed = ref(false);
                     </a>
                 </label>
             </div>
+            <InputFieldError
+                v-if="errors.agree"
+                :error="errors.agree"
+                :class="{
+                    'mb-6': errors.agree,
+                }"
+            />
 
-            <PrimaryButton class="w-full py-2.5 mb-6" :disabled="!agreed">
-                Sign up
-            </PrimaryButton>
+            <PrimaryButton class="w-full py-2.5 mb-6"> Sign up </PrimaryButton>
         </form>
 
         <p class="text-center text-sm text-muted-foreground">

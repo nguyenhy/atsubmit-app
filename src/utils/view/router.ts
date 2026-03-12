@@ -11,15 +11,19 @@ export const Error500ViewAsyncLoader = () =>
 export const ErrorViewAsyncLoader = () =>
     import("@/loaders/Error/HttpStatusLoader.vue");
 
-export const HomeViewAsyncLoader = () => import("@/loaders/HomeLoader.vue");
-export const LoginViewAsyncLoader = () => import("@/loaders/LoginLoader.vue");
-export const SignUpViewAsyncLoader = () => import("@/loaders/SignUpLoader.vue");
-export const ForgotPasswordViewAsyncLoader = () =>
+export const HomeLoader = () => import("@/loaders/HomeLoader.vue");
+export const LoginLoader = () => import("@/loaders/LoginLoader.vue");
+export const SignUpLoader = () => import("@/loaders/SignUpLoader.vue");
+export const ForgotPasswordLoader = () =>
     import("@/loaders/ForgotPasswordLoader.vue");
-export const ResetPasswordPageAsyncLoader = () =>
+export const ForgotPasswordSubmittedLoader = () =>
+    import("@/loaders/ForgotPasswordSubmittedLoader.vue");
+export const ResetPasswordLoader = () =>
     import("@/loaders/ResetPasswordLoader.vue");
-export const ResetPasswordSuccessPageAsyncLoader = () =>
+export const ResetPasswordSuccessLoader = () =>
     import("@/loaders/ResetPasswordSuccessLoader.vue");
+export const ResetPasswordUsedLoader = () =>
+    import("@/loaders/ResetPasswordUsedLoader.vue");
 
 export const HTTP_STATUS_MAP: Record<string, AsyncComponentLoader> = {
     "404": Error404ViewAsyncLoader,
@@ -32,10 +36,12 @@ export const HTTP_STATUS_MAP: Record<string, AsyncComponentLoader> = {
  * - no tail slash
  */
 export const PATH_MAP: Record<string, AsyncComponentLoader> = {
-    "": HomeViewAsyncLoader,
-    login: LoginViewAsyncLoader,
-    signup: SignUpViewAsyncLoader,
-    "forgot-password": ForgotPasswordViewAsyncLoader,
-    "reset-password": ResetPasswordPageAsyncLoader,
-    "reset-password-success": ResetPasswordSuccessPageAsyncLoader,
+    "": HomeLoader,
+    login: LoginLoader,
+    signup: SignUpLoader,
+    "forgot-password": ForgotPasswordLoader,
+    "forgot-password-submitted": ForgotPasswordSubmittedLoader,
+    "reset-password": ResetPasswordLoader,
+    "reset-password-used": ResetPasswordUsedLoader,
+    "reset-password-success": ResetPasswordSuccessLoader,
 };

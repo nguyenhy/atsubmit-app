@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import Layout from "@/layouts/NoAuthedLayout.vue";
-import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
-
-const props = defineProps<{
-    email: string;
-    error?: string | string[];
-}>();
+import ResetPasswordUsedPage from "@/pages/ResetPasswordUsedPage.vue";
 </script>
 
 <template>
     <Layout class="min-h-[80vh] flex items-center justify-center px-6 py-12">
-        <ResetPasswordPage v-bind="props" />
+        <ResetPasswordUsedPage />
     </Layout>
 </template>

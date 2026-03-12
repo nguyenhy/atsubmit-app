@@ -17,4 +17,5 @@ export interface AuthIdentity {
     password_hash: string | null;
 
     created_at: Timestamp;
+    updated_at: Timestamp;
 }

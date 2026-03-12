@@ -2,9 +2,9 @@ import { MainEnv } from "@server/types";
 import { Context } from "hono";
 import { User } from "../Authentication/User";
 import { randomBytes } from "node:crypto";
-import { getSessionService, saveSessionService } from "./sessionService";
+import { saveSessionService } from "./SessionService";
 import { CookiePayload, encryptSessionToken } from "./SessionTokenService";
-import { getSessionCookie, setSessionCookie } from "./CookieService";
+import { setSessionCookie } from "./CookieService";
 
 export const saveUserSessionService = async (
     c: Context<MainEnv>,

@@ -3,7 +3,7 @@ import { zodErrorsToJson } from "@server/utils/zod/error";
 import { validator } from "hono/validator";
 import { z } from "zod";
 
-export const signupPasswordSchema = z
+export const resetPasswordSchema = z
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(128)
@@ -11,33 +11,28 @@ export const signupPasswordSchema = z
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number");
 
-export const signupConfirmPasswordSchema = z.string();
+export const resetConfirmPasswordSchema = z
+    .string()
+    .min(8, "Please confirm your password");
 
-export const signupSchema = z
+export const resetSchema = z
     .object({
-        email: z
-            .email("Invalid email address")
-            .lowercase("Email addresses must be entered in lowercase"),
-        password: signupPasswordSchema,
-        "confirm-password": signupConfirmPasswordSchema,
-        agree: z.union(
-            [z.literal("on"), z.literal("true"), z.literal("1")],
-            "Must agree to the Terms and Privacy Policy",
-        ),
+        token: z.string(),
+        password: resetPasswordSchema,
+        "confirm-password": resetConfirmPasswordSchema,
     })
     .refine((data) => data.password === data["confirm-password"], {
         path: ["confirm-password"],
         message: "Passwords do not match",
     });
 
-export const validateSignUpBodyService = () =>
+export const validateResetBodyService = () =>
     validator("form", (form, c) => {
-        const parsed = signupSchema.safeParse(form);
+        const parsed = resetSchema.safeParse(form);
         if (!parsed.success) {
             return c.html(
                 htmlPage(c, {
                     context: {
-                        email: form.email,
                         error: zodErrorsToJson(parsed.error),
                     },
                 }),

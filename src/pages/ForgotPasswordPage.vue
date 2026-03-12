@@ -1,40 +1,17 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { Mail, CheckCircle2 } from "lucide-vue-next";
+import { Mail } from "lucide-vue-next";
 
 import AuthCard from "../components/AuthCard.vue";
 import InputField from "../components/InputField.vue";
 import PrimaryButton from "@/components/buttons/PrimaryButton.vue";
-
-const submitted = ref(false);
-
-function submit() {
-    submitted.value = true;
-}
 </script>
 
 <template>
     <AuthCard
         title="Reset password"
-        :subtitle="
-            submitted ? '' : 'Enter your email and we will send reset link'
-        "
+        :subtitle="'Enter your email and we will send reset link'"
     >
-        <div v-if="submitted" class="text-center">
-            <CheckCircle2 class="mx-auto mb-6" :size="32" />
-
-            <p class="text-muted-foreground mb-8">
-                If an account exists for this email, a reset link will be sent.
-            </p>
-
-            <a href="/login">
-                <PrimaryButton class="w-full py-2.5 inline-block">
-                    Back to login
-                </PrimaryButton>
-            </a>
-        </div>
-
-        <form v-else @submit.prevent="submit">
+        <form action="/forgot-password" method="post">
             <InputField
                 label="Email Address"
                 :icon="Mail"
