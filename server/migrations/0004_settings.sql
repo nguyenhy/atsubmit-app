@@ -19,7 +19,7 @@ CREATE TABLE user_settings (
     -- submission processing defaults
     default_honeypot_enabled BOOLEAN,
     default_honeypot_class_name VARCHAR(64),
-    default_honeypot_input_name VARCHAR(20),
+    default_honeypot_input_name VARCHAR(64),
     default_honeypot_hidden_style VARCHAR(50),
 
     default_spam_filter_enabled BOOLEAN,

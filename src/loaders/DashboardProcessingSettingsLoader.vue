@@ -5,6 +5,7 @@ import DashboardSettingsPage from "@/pages/DashboardSettingsPage.vue";
 import ProcessingSettings from "@/components/dashboard/DashboardProcessingSettings.vue";
 
 const props = defineProps<{
+    enabled: boolean;
     name: string;
     hiddenStyle: string;
     hiddenClassName: string;

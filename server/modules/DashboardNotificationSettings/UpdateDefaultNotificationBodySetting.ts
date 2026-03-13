@@ -24,7 +24,5 @@ export const updateNotificationSettingSchema = z.object({
 
 export const updateDefaultNotificationBodyService = () =>
     validator("form", (form, c) => {
-        console.log("form", form);
-
         return updateNotificationSettingSchema.safeParse(form);
     });

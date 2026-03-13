@@ -53,8 +53,6 @@ export const upsertDefaultNotificationSetting = async (
             default_notification_email_recipients;
     `;
 
-    console.log("upsertDefaultNotificationSetting", data);
-
     return await lazyPoolExecute(c, async (client) => {
         return client.query<UserNotificationSettings>(query, [
             data.user_id,

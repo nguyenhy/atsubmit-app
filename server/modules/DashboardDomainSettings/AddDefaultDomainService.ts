@@ -67,7 +67,5 @@ export const addDefaultDomainService = async (
         return client.query<UserDomainSettings>(query, params);
     });
 
-    console.log(result.rows);
-
     return result.rows[0] || null;
 };

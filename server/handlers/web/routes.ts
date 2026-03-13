@@ -29,13 +29,16 @@ import { NOTIFICATION_FREQUENT_RULES } from "@server/modules/DashboardNotificati
 import { getDefaultNotificationSetting } from "@server/modules/DashboardNotificationSettings/GetDefaultNotificationSetting";
 import { updateDefaultNotificationBodyService } from "@server/modules/DashboardNotificationSettings/UpdateDefaultNotificationBodySetting";
 import { upsertDefaultNotificationSetting } from "@server/modules/DashboardNotificationSettings/UpdateDefaultNotificationSetting";
-import { honeypotSettingBodyService } from "@server/modules/DashboardProcessingSettings/HoneypotSettingsBodyService";
-import { getAccountHoneypotFormSetting } from "@server/modules/DashboardProcessingSettings/HoneypotSettingsService";
+import { defaultHoneypotSettingBodyService } from "@server/modules/DashboardProcessingSettings/DefaultHoneypotSettingsBodyService";
+import {
+    getDefaultHoneypotFormSetting,
+    upsertUserHoneyPotSetting,
+} from "@server/modules/DashboardProcessingSettings/DefaultHoneypotSettingsService";
+
 import { validateProfileInfoBodyService } from "@server/modules/DashboardProfileSettings/ProfileInfoBodyService";
 import {
     getProfileInfo,
     upsertProfileInfo,
-    upsertUserHoneyPotSetting,
 } from "@server/modules/DashboardProfileSettings/ProfileInfoService";
 import { SUPPORTED_TIMEZONE_OPTIONS } from "@server/modules/DashboardProfileSettings/SupportedTimezone";
 import { deleteSessionCookie } from "@server/modules/Session/CookieService";
@@ -223,11 +226,10 @@ export const registerWebRoutes = (web: WebHono) => {
             return c.redirect("/reset-password-used");
         }
 
-        const result = await resetPasswordService(c, {
+        await resetPasswordService(c, {
             password: form.password,
             user_id: user.id,
         });
-        console.log("result", result);
 
         return c.redirect("/reset-password-success");
     });
@@ -321,10 +323,7 @@ export const registerWebRoutes = (web: WebHono) => {
             );
         }
 
-        const setting = await getAccountHoneypotFormSetting(
-            c,
-            session.user_email,
-        );
+        const setting = await getDefaultHoneypotFormSetting(c, session.user_id);
         return c.html(
             htmlPage(c, {
                 context: setting
@@ -344,7 +343,7 @@ export const registerWebRoutes = (web: WebHono) => {
     });
     dashboard.post(
         "/settings/processing",
-        honeypotSettingBodyService(),
+        defaultHoneypotSettingBodyService(),
         async (c) => {
             const sid = c.get("sid") || "";
             const session = await getSessionService(c, sid);
@@ -358,18 +357,26 @@ export const registerWebRoutes = (web: WebHono) => {
 
             const form = c.req.valid("form");
             if (!form.error) {
-                await upsertUserHoneyPotSetting(c, {
-                    user_id: session.user_id,
-                    enabled: form.data.enabled,
-                    name: form.data.name,
-                    hiddenStyle: form.data.hiddenStyle,
-                    hiddenClassName: form.data.hiddenClassName,
-                });
+                await upsertUserHoneyPotSetting(
+                    c,
+                    !!form.data.enabled
+                        ? {
+                              user_id: session.user_id,
+                              enabled: form.data.enabled,
+                              name: form.data.name,
+                              hiddenStyle: form.data["hidden-style"],
+                              hiddenClassName: form.data["hidden-classname"],
+                          }
+                        : {
+                              user_id: session.user_id,
+                              enabled: form.data.enabled,
+                          },
+                );
             }
 
-            const setting = await getAccountHoneypotFormSetting(
+            const setting = await getDefaultHoneypotFormSetting(
                 c,
-                session.user_email,
+                session.user_id,
             );
             return c.html(
                 htmlPage(c, {
@@ -381,9 +388,15 @@ export const registerWebRoutes = (web: WebHono) => {
                                   setting.default_honeypot_hidden_style || "",
                               hiddenClassName:
                                   setting.default_honeypot_class_name || "",
+                              error: form.error
+                                  ? zodErrorsToJson(form.error)
+                                  : null,
                           }
                         : {
                               enabled: false,
+                              error: form.error
+                                  ? zodErrorsToJson(form.error)
+                                  : null,
                           },
                 }),
             );
@@ -460,7 +473,7 @@ export const registerWebRoutes = (web: WebHono) => {
                     user_id: session.user_id,
                     enabled: form.data.enabled,
                     via_email: true,
-                    frequency: 'weekly',
+                    frequency: "weekly",
                     email_recipients: form.data["email-recipients"],
                 });
             }
