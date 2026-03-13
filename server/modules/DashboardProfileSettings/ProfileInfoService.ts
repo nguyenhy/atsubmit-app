@@ -98,12 +98,17 @@ export const upsertUserHoneyPotSetting = async (
 		ON CONFLICT (user_id)
 		DO UPDATE
 		SET
-			display_name = EXCLUDED.display_name,
-			timezone     = EXCLUDED.timezone,
-			updated_at   = now();
+			default_honeypot_enabled		= EXCLUDED.default_honeypot_enabled,
+			default_honeypot_class_name		= EXCLUDED.default_honeypot_class_name,
+			default_honeypot_input_name		= EXCLUDED.default_honeypot_input_name,
+			default_honeypot_hidden_style	= EXCLUDED.default_honeypot_hidden_style,
+			updated_at   					= now();
 		WHERE
-			user_profiles.display_name IS DISTINCT FROM EXCLUDED.display_name
-			OR user_profiles.timezone  IS DISTINCT FROM EXCLUDED.timezone;
+			user_settings.default_honeypot_enabled				IS DISTINCT FROM EXCLUDED.default_honeypot_enabled,
+			OR user_settings.default_honeypot_class_name		IS DISTINCT FROM EXCLUDED.default_honeypot_class_name,
+			OR user_settings.default_honeypot_input_name		IS DISTINCT FROM EXCLUDED.default_honeypot_input_name,
+			OR user_settings.default_honeypot_hidden_style		IS DISTINCT FROM EXCLUDED.default_honeypot_hidden_style
+		;
 	`;
     return await lazyPoolExecute(c, async (client) => {
         return client.query(query, [

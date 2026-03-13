@@ -6,6 +6,7 @@ import { useFormError } from "@/composition/useFormError";
 import InputFieldError from "../InputFieldError.vue";
 import { computed, ref } from "vue";
 import Toggle from "./Toggle.vue";
+import CodeBlock from "./CodeBlock.vue";
 
 const props = defineProps<{
     action: string;
@@ -131,16 +132,16 @@ const { msg, errors } = useFormError(props.error);
                                         Not Selected
                                     </option>
                                     <option value="type">
-                                        {{ '<input type="hidden" />' }}
+                                        Hidden Input (type="hidden")
                                     </option>
                                     <option value="display">
-                                        display: none
+                                        Hide with CSS (display: none)
                                     </option>
                                     <option value="visibility">
-                                        visibility: hidden
+                                        Hide with CSS (visibility: hidden)
                                     </option>
                                     <option value="classname">
-                                        Custom Classname
+                                        Hide with Custom Class (recommended)
                                     </option>
                                 </select>
                             </template>
@@ -169,9 +170,7 @@ const { msg, errors } = useFormError(props.error);
                         </InputField>
                     </div>
 
-                    <div v-if="html" class="code-block">
-                        <pre>{{ html }}</pre>
-                    </div>
+                    <CodeBlock v-if="html" :code="html"></CodeBlock>
 
                     <div class="pt-4 border-t border-border">
                         <button class="btn-primary px-8">

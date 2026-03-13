@@ -4,7 +4,10 @@ import Layout from "@/layouts/AuthedLayout.vue";
 import DashboardSettingsPage from "@/pages/DashboardSettingsPage.vue";
 import DomainSettings from "@/components/dashboard/DashboardDomainSettings.vue";
 
-const props = defineProps<{}>();
+const props = defineProps<{
+    allowed: string[];
+    disallowed: string[];
+}>();
 </script>
 
 <template>

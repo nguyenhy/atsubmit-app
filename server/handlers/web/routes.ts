@@ -20,6 +20,11 @@ import {
     emailSignupService,
     verifyCanSignUpWithEmail,
 } from "@server/modules/Authentication/SignUpService";
+import { addDefaultDomainBodyService } from "@server/modules/DashboardDomainSettings/AddDefaultDomainBodyService";
+import { addDefaultDomainService } from "@server/modules/DashboardDomainSettings/AddDefaultDomainService";
+import { deleteDefaultDomainBodyService } from "@server/modules/DashboardDomainSettings/DeleteDefaultDomainBodyService";
+import { deleteDefaultDomainService } from "@server/modules/DashboardDomainSettings/DeleteDefaultDomainService";
+import { getDefaultDomainService } from "@server/modules/DashboardDomainSettings/GetDefaultDomainService";
 import { honeypotSettingBodyService } from "@server/modules/DashboardProcessingSettings/HoneypotSettingsBodyService";
 import { getAccountHoneypotFormSetting } from "@server/modules/DashboardProcessingSettings/HoneypotSettingsService";
 import { validateProfileInfoBodyService } from "@server/modules/DashboardProfileSettings/ProfileInfoBodyService";
@@ -318,12 +323,18 @@ export const registerWebRoutes = (web: WebHono) => {
         );
         return c.html(
             htmlPage(c, {
-                context: {
-                    enabled: !!setting.default_honeypot_enabled,
-                    name: setting.default_honeypot_input_name,
-                    hiddenStyle: setting.default_honeypot_hidden_style,
-                    hiddenClassName: setting.default_honeypot_class_name || "",
-                },
+                context: setting
+                    ? {
+                          enabled: !!setting.default_honeypot_enabled,
+                          name: setting.default_honeypot_input_name || "",
+                          hiddenStyle:
+                              setting.default_honeypot_hidden_style || "",
+                          hiddenClassName:
+                              setting.default_honeypot_class_name || "",
+                      }
+                    : {
+                          enabled: false,
+                      },
             }),
         );
     });
@@ -358,23 +369,104 @@ export const registerWebRoutes = (web: WebHono) => {
             );
             return c.html(
                 htmlPage(c, {
-                    context: {
-                        enabled: !!setting.default_honeypot_enabled,
-                        name: setting.default_honeypot_input_name,
-                        hiddenStyle: setting.default_honeypot_hidden_style,
-                        hiddenClassName:
-                            setting.default_honeypot_class_name || "",
-                    },
+                    context: setting
+                        ? {
+                              enabled: !!setting.default_honeypot_enabled,
+                              name: setting.default_honeypot_input_name || "",
+                              hiddenStyle:
+                                  setting.default_honeypot_hidden_style || "",
+                              hiddenClassName:
+                                  setting.default_honeypot_class_name || "",
+                          }
+                        : {
+                              enabled: false,
+                          },
                 }),
             );
         },
     );
     dashboard.get("/settings/domains", async (c) => {
-        return c.html(htmlPage(c, {}));
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+        const result = await getDefaultDomainService(c, session.user_id);
+        return c.html(
+            htmlPage(c, {
+                context: {
+                    allowed: result?.default_allowed_domains || [],
+                    disallowed: result?.default_disallowed_domains || [],
+                },
+            }),
+        );
     });
     dashboard.get("/settings/notifications", async (c) => {
         return c.html(htmlPage(c, {}));
     });
 };
 
-export const registerWebApiRoutes = (webApi: WebApiHono) => {};
+export const registerWebApiRoutes = (webApi: WebApiHono) => {
+    const dashboard = webApi.basePath("/dashboard");
+    dashboard.use("*", sessionRequiredMiddleware("/login"));
+    dashboard.put(
+        "/settings/domains",
+        addDefaultDomainBodyService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const form = c.req.valid("json");
+            const allow = form.allow;
+            const disallow = form.disallow;
+            const result = await addDefaultDomainService(c, {
+                user_id: session.user_id,
+                allow: allow,
+                disallow: disallow,
+            });
+            return c.json({
+                allowed: result.default_allowed_domains,
+                disallowed: result.default_disallowed_domains,
+            });
+        },
+    );
+    dashboard.delete(
+        "/settings/domains",
+        deleteDefaultDomainBodyService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const form = c.req.valid("json");
+            const allow = form.allow;
+            const disallow = form.disallow;
+            const result = await deleteDefaultDomainService(c, {
+                user_id: session.user_id,
+                allow: allow,
+                disallow: disallow,
+            });
+            return c.json({
+                allowed: result.default_allowed_domains,
+                disallowed: result.default_disallowed_domains,
+            });
+        },
+    );
+};

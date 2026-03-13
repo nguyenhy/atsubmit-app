@@ -14,7 +14,7 @@ import {
     Form,
 } from "lucide-vue-next";
 import Layout from "@/layouts/Base.vue";
-
+import DarkModeToggler from "@/components/DarkModeToggler.vue";
 
 const isSidebarCollapsed = ref(false);
 const isMobileMenuOpen = ref(false);
@@ -64,7 +64,7 @@ function isParentActive(path: string) {
     <Layout class="min-h-screen bg-background flex flex-col md:flex-row">
         <!-- Mobile Header -->
         <header
-            class="md:hidden h-16 border-b border-border px-4 flex items-center justify-between sticky top-0 z-50"
+            class="md:hidden h-16 border-b border-border px-4 flex items-center justify-between sticky top-0 z-50 bg-background"
         >
             <div class="flex items-center gap-2">
                 <div
@@ -76,6 +76,8 @@ function isParentActive(path: string) {
                 <span class="font-bold">AtSubmit</span>
             </div>
 
+            <div class="mx-auto"></div>
+            <DarkModeToggler />
             <button
                 @click="isMobileMenuOpen = !isMobileMenuOpen"
                 class="p-2 rounded-lg hover:bg-muted"
@@ -175,7 +177,7 @@ function isParentActive(path: string) {
         <!-- Mobile Menu -->
         <div
             v-if="isMobileMenuOpen"
-            class="md:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
+            class="md:hidden fixed inset-0 z-40 bg-background/10 backdrop-blur-sm"
             @click="isMobileMenuOpen = false"
         >
             <div
@@ -220,7 +222,7 @@ function isParentActive(path: string) {
         <!-- Main Area -->
         <main class="grow flex flex-col min-w-0">
             <header
-                class="h-16 border-b border-border px-6 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-30"
+                class="h-16 border-b border-border px-6 flex items-center justify-between sticky top-0 bg-background/10 backdrop-blur-md z-30"
             >
                 <div class="flex items-center gap-4 grow max-w-xl">
                     <div class="relative w-full">

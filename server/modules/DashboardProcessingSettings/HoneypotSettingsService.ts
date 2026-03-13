@@ -10,7 +10,7 @@ export const getAccountHoneypotFormSetting = async (
 		SELECT
 			us.default_honeypot_enabled
 			, us.default_honeypot_class_name
-			, us.default_honeypot_input_type
+			, us.default_honeypot_input_name
 			, us.default_honeypot_hidden_style
 		FROM users u
 		JOIN user_settings us

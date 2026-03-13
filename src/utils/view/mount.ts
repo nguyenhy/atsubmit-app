@@ -12,9 +12,8 @@ import {
     PATH_MAP,
 } from "./router";
 import { PageLoadFailError } from "../../loaders/Loads/PageLoadFailLoader.types";
-import {
-    getSupportedHttpStatusProp,
-} from "@/loaders/Error/HttpStatusLoader.const";
+import { getSupportedHttpStatusProp } from "@/loaders/Error/HttpStatusLoader.const";
+import { initTheme } from "../theme";
 
 export const mount = async ($container: HTMLDivElement, pathname: string) => {
     const rawHttpStatus = $container.getAttribute("data-status");
@@ -22,6 +21,8 @@ export const mount = async ($container: HTMLDivElement, pathname: string) => {
 
     const rawContext = $container.getAttribute("data-context");
     // $container.removeAttribute("data-context");
+
+    initTheme();
 
     let loader: AsyncComponentLoader | null = null;
     let props: Record<string, unknown> | null = null;
