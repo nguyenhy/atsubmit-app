@@ -69,6 +69,8 @@ function onFocus() {
 }
 
 function onBlur() {
+    if (props.input?.disabled) return;
+
     if (inputValue.value.trim()) {
         addItems(inputValue.value);
         inputValue.value = "";
@@ -128,7 +130,11 @@ function focusInput() {
     <div>
         <div
             :class="[
-                'flex flex-wrap items-center gap-0.5 p-0.5 rounded-lg bg-muted border border-border transition-all focus-within:ring-2 focus-within:ring-apple-blue/50 focus-within:border-apple-blue/50',
+                'flex flex-wrap items-center',
+                'gap-0.5 p-2 rounded-lg bg-muted',
+                'border border-foreground/50',
+                'transition-all',
+                'focus-within:ring-2 focus-within:ring-apple-blue/50 focus-within:border-apple-blue/50',
                 !!input?.disabled && 'opacity-50 cursor-not-allowed',
             ]"
             @click="focusInput"

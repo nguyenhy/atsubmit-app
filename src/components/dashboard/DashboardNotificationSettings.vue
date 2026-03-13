@@ -191,7 +191,7 @@ const { msg, errors } = useFormError(props.error);
                                             :value="emailRecipients.join(',')"
                                         />
                                         <InputBadge
-                                            class="w-full p-2"
+                                            class="w-full"
                                             v-model="emailRecipients"
                                             :input="{
                                                 type: 'email',
