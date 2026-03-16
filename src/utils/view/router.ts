@@ -41,6 +41,12 @@ const DashboardCreateNewFormLoader = () =>
     import("@/loaders/DashboardCreateNewFormLoader.vue");
 const DashboardEditFormGeneralSettingsLoader = () =>
     import("@/loaders/DashboardEditFormGeneralSettingsLoader.vue");
+const DashboardEditFormProcessingSettingsLoader = () =>
+    import("@/loaders/DashboardEditFormProcessingSettingsLoader.vue");
+const DashboardEditFormDomainSettingsLoader = () =>
+    import("@/loaders/DashboardEditFormDomainSettingsLoader.vue");
+const DashboardEditFormNotificationSettingsLoader = () =>
+    import("@/loaders/DashboardEditFormNotificationSettingsLoader.vue");
 
 export const HTTP_STATUS_MAP: Record<string, AsyncComponentLoader> = {
     "404": Error404ViewAsyncLoader,
@@ -74,4 +80,8 @@ export const PATH_MAP: Record<string, AsyncComponentLoader> = {
     "dashboard/forms/new": DashboardCreateNewFormLoader,
     "dashboard/form/:id": DashboardEditFormGeneralSettingsLoader,
     "dashboard/form/:id/general": DashboardEditFormGeneralSettingsLoader,
+    "dashboard/form/:id/processing": DashboardEditFormProcessingSettingsLoader,
+    "dashboard/form/:id/domains": DashboardEditFormDomainSettingsLoader,
+    "dashboard/form/:id/notifications":
+        DashboardEditFormNotificationSettingsLoader,
 };

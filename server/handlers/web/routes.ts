@@ -25,13 +25,23 @@ import { addDefaultDomainService } from "@server/modules/DashboardDomainSettings
 import { deleteDefaultDomainBodyService } from "@server/modules/DashboardDomainSettings/DeleteDefaultDomainBodyService";
 import { deleteDefaultDomainService } from "@server/modules/DashboardDomainSettings/DeleteDefaultDomainService";
 import { getDefaultDomainService } from "@server/modules/DashboardDomainSettings/GetDefaultDomainService";
+import { addFormDomainBodyService } from "@server/modules/DashboardForm/AddFormDomainBodyService";
+import { addFormDomainService } from "@server/modules/DashboardForm/AddFormDomainService";
 import { createNewFormBodyService } from "@server/modules/DashboardForm/CreateNewFormBodyService";
 import {
     createSubmissionEndpoint,
     quickCreateNewFormService,
 } from "@server/modules/DashboardForm/CreateNewFormService";
+import { deleteFormDomainService } from "@server/modules/DashboardForm/DeleteFormDomainService";
+import { getFormDomainService } from "@server/modules/DashboardForm/GetFormDomainService";
 import { getFormGeneralSetting } from "@server/modules/DashboardForm/getFormGeneralSettingService";
+import { getFormNotificationSetting } from "@server/modules/DashboardForm/GetFormNotificationSetting";
 import { paginateForm } from "@server/modules/DashboardForm/getFormService";
+import { honeypotFormSettingBodyService } from "@server/modules/DashboardForm/HoneypotFormSettingsBodyService";
+import {
+    getHoneypotFormSetting,
+    updateHoneyPotFormSetting,
+} from "@server/modules/DashboardForm/HoneypotFormSettingsService";
 import {
     createRandomSlug,
     createRandomToken,
@@ -39,6 +49,8 @@ import {
 } from "@server/modules/DashboardForm/RefreshSubmitTokenService";
 import { validateFormGeneralSettingService } from "@server/modules/DashboardForm/UpdateFormGeneralSettingBodyService";
 import { updateFormGeneralSettingService } from "@server/modules/DashboardForm/UpdateFormGeneralSettingService";
+import { updateFormNotificationBodyService } from "@server/modules/DashboardForm/UpdateFormNotificationBodySetting";
+import { updateFormNotificationSetting } from "@server/modules/DashboardForm/UpdateFormNotificationSetting";
 import { NOTIFICATION_FREQUENT_RULES } from "@server/modules/DashboardNotificationSettings/GetDefaultNotificationFrequentRule";
 import { getDefaultNotificationSetting } from "@server/modules/DashboardNotificationSettings/GetDefaultNotificationSetting";
 import { updateDefaultNotificationBodyService } from "@server/modules/DashboardNotificationSettings/UpdateDefaultNotificationBodySetting";
@@ -367,6 +379,224 @@ export const registerWebRoutes = (web: WebHono) => {
                             ? zodErrorsToJson(form.error)
                             : undefined,
                     },
+                }),
+            );
+        },
+    );
+
+    dashboard.get("/form/:id/processing", async (c) => {
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const formId = c.req.param("id");
+        const setting = await getHoneypotFormSetting(c, {
+            user_id: session.user_id,
+            id: formId,
+        });
+        if (!setting) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        return c.html(
+            htmlPage(c, {
+                context: {
+                    formId: formId,
+                    enabled: !!setting.honeypot_enabled,
+                    name: setting.honeypot_input_name || "",
+                    hiddenStyle: setting.honeypot_hidden_style || "",
+                    hiddenClassName: setting.honeypot_class_name || "",
+                },
+            }),
+        );
+    });
+    dashboard.post(
+        "/form/:id/processing",
+        honeypotFormSettingBodyService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const formId = c.req.param("id");
+            const form = c.req.valid("form");
+            if (!form.error) {
+                await updateHoneyPotFormSetting(
+                    c,
+                    !!form.data.enabled
+                        ? {
+                              user_id: session.user_id,
+                              id: formId,
+
+                              enabled: form.data.enabled,
+                              name: form.data.name,
+                              hiddenStyle: form.data["hidden-style"],
+                              hiddenClassName: form.data["hidden-classname"],
+                          }
+                        : {
+                              user_id: session.user_id,
+                              id: formId,
+
+                              enabled: form.data.enabled,
+                          },
+                );
+            }
+
+            const setting = await getHoneypotFormSetting(c, {
+                user_id: session.user_id,
+                id: formId,
+            });
+            if (!setting) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            return c.html(
+                htmlPage(c, {
+                    context: {
+                        formId: formId,
+                        enabled: !!setting.honeypot_enabled,
+                        name: setting.honeypot_input_name || "",
+                        hiddenStyle: setting.honeypot_hidden_style || "",
+                        hiddenClassName: setting.honeypot_class_name || "",
+                    },
+                }),
+            );
+        },
+    );
+
+    dashboard.get("/form/:id/domains", async (c) => {
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+        const formId = c.req.param("id");
+        const result = await getFormDomainService(c, {
+            user_id: session.user_id,
+            id: formId,
+        });
+        return c.html(
+            htmlPage(c, {
+                context: {
+                    formId: formId,
+                    allowed: result?.allowed_domains || [],
+                    disallowed: result?.disallowed_domains || [],
+                },
+            }),
+        );
+    });
+
+    dashboard.get("/form/:id/notifications", async (c) => {
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const formId = c.req.param("id");
+        const result = await getFormNotificationSetting(c, {
+            user_id: session.user_id,
+            id: formId,
+        });
+        return c.html(
+            htmlPage(c, {
+                context: result
+                    ? {
+                          formId,
+                          rules: NOTIFICATION_FREQUENT_RULES,
+                          enabled: !!result.notification_enabled,
+                          method: "email",
+                          frequency: "weekly",
+                          email_owner: session.user_email,
+                          email_recipients:
+                              result.notification_email_recipients,
+                      }
+                    : {
+                          formId,
+                          rules: NOTIFICATION_FREQUENT_RULES,
+                          enabled: false,
+                      },
+            }),
+        );
+    });
+    dashboard.post(
+        "/form/:id/notifications",
+        updateFormNotificationBodyService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const formId = c.req.param("id");
+            const form = await c.req.valid("form");
+            if (!form.error) {
+                const result = await updateFormNotificationSetting(c, {
+                    user_id: session.user_id,
+                    id: formId,
+                    enabled: form.data.enabled,
+                    via_email: true,
+                    frequency: "weekly",
+                    email_recipients: form.data["email-recipients"],
+                });
+                console.log("result", result);
+            }
+
+            const result = await getFormNotificationSetting(c, {
+                user_id: session.user_id,
+                id: formId,
+            });
+            return c.html(
+                htmlPage(c, {
+                    context: result
+                        ? {
+                              formId,
+                              rules: NOTIFICATION_FREQUENT_RULES,
+                              enabled: !!result.notification_enabled,
+                              method: "email",
+                              frequency: "weekly",
+                              email_owner: session.user_email,
+                              email_recipients:
+                                  result.notification_email_recipients,
+                          }
+                        : {
+                              formId,
+                              rules: NOTIFICATION_FREQUENT_RULES,
+                              enabled: false,
+                          },
                 }),
             );
         },
@@ -778,4 +1008,63 @@ export const registerWebApiRoutes = (webApi: WebApiHono) => {
             token: token,
         });
     });
+
+    dashboard.put(
+        "/form/:id/domains",
+        addFormDomainBodyService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const form = c.req.valid("json");
+            const allow = form.allow;
+            const disallow = form.disallow;
+            const result = await addFormDomainService(c, {
+                user_id: session.user_id,
+                id: c.req.param("id"),
+                allow: allow,
+                disallow: disallow,
+            });
+            return c.json({
+                allowed: result.allowed_domains,
+                disallowed: result.disallowed_domains,
+            });
+        },
+    );
+    dashboard.delete(
+        "/form/:id/domains",
+        deleteDefaultDomainBodyService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const form = c.req.valid("json");
+            const allow = form.allow;
+            const disallow = form.disallow;
+            const result = await deleteFormDomainService(c, {
+                user_id: session.user_id,
+                id: c.req.param("id"),
+                allow: allow,
+                disallow: disallow,
+            });
+            return c.json({
+                allowed: result.default_allowed_domains,
+                disallowed: result.default_disallowed_domains,
+            });
+        },
+    );
 };

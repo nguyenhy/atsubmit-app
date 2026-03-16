@@ -7,6 +7,7 @@ import { doFetch } from "@/utils/request";
 import { isValidDomain, isValidDomainGlob } from "@/utils/domain";
 
 const props = defineProps<{
+    action: string;
     allowed: string[];
     disallowed: string[];
 }>();
@@ -25,7 +26,7 @@ const onSubmitAdd = async (allow: boolean, value: string) => {
         inputAllowedDomainError.value = true;
         return;
     }
-    const response = await doFetch("/webapi/dashboard/settings/domains", {
+    const response = await doFetch(props.action, {
         method: "PUT",
         body: JSON.stringify(
             allow
@@ -51,7 +52,7 @@ const onSubmitAdd = async (allow: boolean, value: string) => {
 };
 
 const onClickDelete = async (allow: boolean, domain: String) => {
-    const response = await doFetch("/webapi/dashboard/settings/domains", {
+    const response = await doFetch(props.action, {
         method: "DELETE",
         body: JSON.stringify(
             allow
@@ -195,9 +196,10 @@ const onClickDelete = async (allow: boolean, domain: String) => {
 
         <Card title="Domain rule priority">
             <p>
-                <b><i>Disallowed Domains</i></b> take priority. If a domain appears
-                in both lists, it will be blocked. When an <b><i>allow list</i></b> is set,
-                only submissions from those domains are accepted.
+                <b><i>Disallowed Domains</i></b> take priority. If a domain
+                appears in both lists, it will be blocked. When an
+                <b><i>allow list</i></b> is set, only submissions from those
+                domains are accepted.
             </p>
         </Card>
     </div>

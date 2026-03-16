@@ -2,7 +2,7 @@
 import Layout from "@/layouts/AuthedLayout.vue";
 
 import DashboardSettingsPage from "@/pages/DashboardSettingsPage.vue";
-import DomainSettings from "@/components/dashboard/DashboardDomainSettings.vue";
+import DashboardDomainSettings from "@/components/dashboard/DashboardDomainSettings.vue";
 
 const props = defineProps<{
     allowed: string[];
@@ -13,7 +13,10 @@ const props = defineProps<{
 <template>
     <Layout>
         <DashboardSettingsPage tab="domains">
-            <DomainSettings v-bind="props" />
+            <DashboardDomainSettings
+                action="/webapi/dashboard/settings/domains"
+                v-bind="props"
+            />
         </DashboardSettingsPage>
     </Layout>
 </template>
