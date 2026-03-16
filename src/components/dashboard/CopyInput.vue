@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Copy } from "lucide-vue-next";
+import { useClipboard } from "@/utils/clipboard";
 
 const props = defineProps<{
     value: string;
     label?: string;
 }>();
 
-const copied = ref(false);
+const { copied, copy } = useClipboard();
 
-const copy = async () => {
-    await navigator.clipboard.writeText(props.value);
-    copied.value = true;
-    setTimeout(() => (copied.value = false), 2000);
+const onClick = async () => {
+    await copy(props.value);
 };
 </script>
 
@@ -26,11 +25,11 @@ const copy = async () => {
             <input
                 readonly
                 :value="value"
-                class="flex-grow px-4 py-2 rounded-lg bg-muted border border-border font-mono text-sm focus:outline-none"
+                class="grow px-4 py-2 rounded-lg bg-muted border border-border font-mono text-sm focus:outline-none"
             />
 
             <button
-                @click="copy"
+                @click="onClick"
                 class="px-4 py-2 rounded-lg bg-apple-blue text-white font-medium hover:opacity-90 transition-all flex items-center gap-2"
             >
                 <span v-if="copied"> Copied! </span>

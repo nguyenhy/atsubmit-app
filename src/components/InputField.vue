@@ -59,6 +59,15 @@
             </div>
         </div>
 
+        <!-- hint -->
+        <slot name="hint">
+            <div>
+                <p v-if="hint" class="mt-1 text-xs text-muted-foreground">
+                    {{ hint }}
+                </p>
+            </div>
+        </slot>
+
         <!-- errors -->
         <InputFieldError v-if="error" :error="error" class="mt-1" />
     </div>
@@ -73,6 +82,7 @@ const props = defineProps<{
     icon?: any;
     input?: InputHTMLAttributes;
     error?: string | string[];
+    hint?: string;
 }>();
 
 const inputClasses = computed(() => [

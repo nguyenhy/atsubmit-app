@@ -14,6 +14,7 @@ import {
 import { PageLoadFailError } from "../../loaders/Loads/PageLoadFailLoader.types";
 import { getSupportedHttpStatusProp } from "@/loaders/Error/HttpStatusLoader.const";
 import { initTheme } from "../theme";
+import { matchRoute, RouteKey, type Route } from "./route";
 
 export const mount = async ($container: HTMLDivElement, pathname: string) => {
     const rawHttpStatus = $container.getAttribute("data-status");
@@ -26,6 +27,7 @@ export const mount = async ($container: HTMLDivElement, pathname: string) => {
 
     let loader: AsyncComponentLoader | null = null;
     let props: Record<string, unknown> | null = null;
+    let params: Record<string, string> = {};
 
     const name = pathname
         // remove tail slash
@@ -53,12 +55,13 @@ export const mount = async ($container: HTMLDivElement, pathname: string) => {
             loader = Error500ViewAsyncLoader;
         }
     } else {
-        const ViewAsyncLoader = PATH_MAP[name];
+        const ViewAsyncLoader = matchRoute(name, PATH_MAP);
         if (ViewAsyncLoader) {
+            params = ViewAsyncLoader.params;
             if (rawContext) {
                 try {
                     props = JSON.parse(rawContext);
-                    loader = ViewAsyncLoader;
+                    loader = ViewAsyncLoader.loader;
                 } catch (error) {
                     props = {
                         error: error,
@@ -67,7 +70,7 @@ export const mount = async ($container: HTMLDivElement, pathname: string) => {
                     loader = Error500ViewAsyncLoader;
                 }
             } else {
-                loader = ViewAsyncLoader;
+                loader = ViewAsyncLoader.loader;
             }
         }
     }
@@ -104,5 +107,13 @@ export const mount = async ($container: HTMLDivElement, pathname: string) => {
     });
 
     const app = createApp(RootComponent, props);
+
+    const route: Route = {
+        path: location.pathname,
+        params: params,
+        query: Object.fromEntries(new URLSearchParams(location.search)),
+    };
+    app.provide(RouteKey, route);
+
     app.mount($container);
 };

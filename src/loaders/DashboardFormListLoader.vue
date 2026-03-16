@@ -3,7 +3,12 @@ import Layout from "@/layouts/AuthedLayout.vue";
 
 import DashboardFormListPage from "@/pages/DashboardFormListPage.vue";
 
-const props = defineProps<{}>();
+const props = defineProps<{
+    items: any[];
+    total: number;
+    page: number;
+    limit: number;
+}>();
 </script>
 
 <template>

@@ -39,6 +39,8 @@ const DashboardFormListLoader = () =>
     import("@/loaders/DashboardFormListLoader.vue");
 const DashboardCreateNewFormLoader = () =>
     import("@/loaders/DashboardCreateNewFormLoader.vue");
+const DashboardEditFormGeneralSettingsLoader = () =>
+    import("@/loaders/DashboardEditFormGeneralSettingsLoader.vue");
 
 export const HTTP_STATUS_MAP: Record<string, AsyncComponentLoader> = {
     "404": Error404ViewAsyncLoader,
@@ -70,4 +72,6 @@ export const PATH_MAP: Record<string, AsyncComponentLoader> = {
 
     "dashboard/forms": DashboardFormListLoader,
     "dashboard/forms/new": DashboardCreateNewFormLoader,
+    "dashboard/form/:id": DashboardEditFormGeneralSettingsLoader,
+    "dashboard/form/:id/general": DashboardEditFormGeneralSettingsLoader,
 };

@@ -25,6 +25,20 @@ import { addDefaultDomainService } from "@server/modules/DashboardDomainSettings
 import { deleteDefaultDomainBodyService } from "@server/modules/DashboardDomainSettings/DeleteDefaultDomainBodyService";
 import { deleteDefaultDomainService } from "@server/modules/DashboardDomainSettings/DeleteDefaultDomainService";
 import { getDefaultDomainService } from "@server/modules/DashboardDomainSettings/GetDefaultDomainService";
+import { createNewFormBodyService } from "@server/modules/DashboardForm/CreateNewFormBodyService";
+import {
+    createSubmissionEndpoint,
+    quickCreateNewFormService,
+} from "@server/modules/DashboardForm/CreateNewFormService";
+import { getFormGeneralSetting } from "@server/modules/DashboardForm/getFormGeneralSettingService";
+import { paginateForm } from "@server/modules/DashboardForm/getFormService";
+import {
+    createRandomSlug,
+    createRandomToken,
+    refreshSubmitToken,
+} from "@server/modules/DashboardForm/RefreshSubmitTokenService";
+import { validateFormGeneralSettingService } from "@server/modules/DashboardForm/UpdateFormGeneralSettingBodyService";
+import { updateFormGeneralSettingService } from "@server/modules/DashboardForm/UpdateFormGeneralSettingService";
 import { NOTIFICATION_FREQUENT_RULES } from "@server/modules/DashboardNotificationSettings/GetDefaultNotificationFrequentRule";
 import { getDefaultNotificationSetting } from "@server/modules/DashboardNotificationSettings/GetDefaultNotificationSetting";
 import { updateDefaultNotificationBodyService } from "@server/modules/DashboardNotificationSettings/UpdateDefaultNotificationBodySetting";
@@ -239,11 +253,180 @@ export const registerWebRoutes = (web: WebHono) => {
     dashboard.get("/", async (c) => {
         return c.html(htmlPage(c, {}));
     });
+    dashboard.get("/form/:id", async (c) => {
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const id = c.req.param("id");
+        return c.redirect(`/dashboard/form/${id || ""}/general`);
+    });
+    dashboard.get("/form/:id/general", async (c) => {
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const id = c.req.param("id");
+        const setting = await getFormGeneralSetting(c, {
+            user_id: session.user_id,
+            id: id,
+        });
+        if (!setting) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 404,
+                }),
+            );
+        }
+
+        return c.html(
+            htmlPage(c, {
+                context: {
+                    formId: id,
+                    endpointUrl: createSubmissionEndpoint(
+                        setting.endpoint_slug,
+                    ),
+                    name: setting.name || "",
+                    isActive: !!setting.is_active,
+                    submitToken: setting.submit_token,
+
+                    error: undefined,
+                },
+            }),
+        );
+    });
+    dashboard.post(
+        "/form/:id/general",
+        validateFormGeneralSettingService(),
+        async (c) => {
+            const sid = c.get("sid") || "";
+            const session = await getSessionService(c, sid);
+            if (!session) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 401,
+                    }),
+                );
+            }
+
+            const id = c.req.param("id");
+            const form = c.req.valid("form");
+            if (!form.error) {
+                console.log(form.data);
+
+                await updateFormGeneralSettingService(c, {
+                    user_id: session.user_id,
+                    id: id,
+                    ...(form.data.active
+                        ? {
+                              isActive: true,
+                              name: form.data.name,
+                          }
+                        : {
+                              isActive: false,
+                          }),
+                });
+            }
+
+            const setting = await getFormGeneralSetting(c, {
+                user_id: session.user_id,
+                id: id,
+            });
+            if (!setting) {
+                return c.html(
+                    htmlPage(c, {
+                        httpStatus: 404,
+                    }),
+                );
+            }
+
+            return c.html(
+                htmlPage(c, {
+                    context: {
+                        formId: id,
+                        endpointUrl: createSubmissionEndpoint(
+                            setting.endpoint_slug,
+                        ),
+                        name: setting.name || "",
+                        isActive: !!setting.is_active,
+                        submitToken: setting.submit_token,
+
+                        error: form.error
+                            ? zodErrorsToJson(form.error)
+                            : undefined,
+                    },
+                }),
+            );
+        },
+    );
+
     dashboard.get("/forms", async (c) => {
-        return c.html(htmlPage(c));
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const result = await paginateForm(c, {
+            user_id: session.user_id,
+            page: 1,
+            limit: 10,
+        });
+
+        return c.html(
+            htmlPage(c, {
+                context: {
+                    items: result.items,
+                    total: result.total,
+                    page: result.page,
+                    limit: result.limit,
+                },
+            }),
+        );
     });
     dashboard.get("/forms/new", async (c) => {
         return c.html(htmlPage(c));
+    });
+    dashboard.post("/forms/new", createNewFormBodyService(), async (c) => {
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const token = createRandomToken();
+        const slug = createRandomSlug();
+        const form = c.req.valid("form");
+
+        const result = await quickCreateNewFormService(c, {
+            user_id: session.user_id,
+            name: form.name,
+            slug: slug,
+            token: token,
+        });
+        console.log(result);
+
+        return c.redirect("/dashboard/forms");
     });
     dashboard.get("/submissions", async (c) => {
         return c.html(htmlPage(c, {}));
@@ -572,4 +755,27 @@ export const registerWebApiRoutes = (webApi: WebApiHono) => {
             });
         },
     );
+
+    dashboard.post("/form/:id/submit_token", async (c) => {
+        const sid = c.get("sid") || "";
+        const session = await getSessionService(c, sid);
+        if (!session) {
+            return c.html(
+                htmlPage(c, {
+                    httpStatus: 401,
+                }),
+            );
+        }
+
+        const token = createRandomToken();
+        await refreshSubmitToken(c, {
+            user_id: session.user_id,
+            id: c.req.param("id"),
+            token: token,
+        });
+
+        return c.json({
+            token: token,
+        });
+    });
 };

@@ -2,38 +2,31 @@
 import DashboardHeader from "@/components/dashboard/DashboardHeader.vue";
 import Card from "@/components/dashboard/Card.vue";
 import Table from "@/components/dashboard/Table.vue";
-import { Copy, Eye, Edit2, Trash2, Plus } from "lucide-vue-next";
+import { Copy, Eye, Edit2, Trash2, Plus, Check } from "lucide-vue-next";
+import type { FormInfoItem, FormItem } from "./DashboardFormListPage.types";
+import { onBeforeMount, ref } from "vue";
+import { useClipboardMap } from "@/utils/clipboard";
 
-const forms = [
-    {
-        id: "f_123",
-        name: "Contact Sales",
-        endpoint: "https://api.atsubmit.com/f/f_123",
-        submissions: 42,
-        status: "active",
-    },
-    {
-        id: "f_456",
-        name: "Newsletter Signup",
-        endpoint: "https://api.atsubmit.com/f/f_456",
-        submissions: 128,
-        status: "active",
-    },
-    {
-        id: "f_789",
-        name: "Job Application",
-        endpoint: "https://api.atsubmit.com/f/f_789",
-        submissions: 15,
-        status: "inactive",
-    },
-    {
-        id: "f_012",
-        name: "Support Request",
-        endpoint: "https://api.atsubmit.com/f/f_012",
-        submissions: 8,
-        status: "active",
-    },
-];
+const props = defineProps<{
+    items: FormInfoItem[];
+    total: number;
+    page: number;
+    limit: number;
+}>();
+const items = ref<FormItem[]>([]);
+
+onBeforeMount(() => {
+    for (let index = 0; index < props.items.length; index++) {
+        const element = props.items[index];
+        if (element) {
+            items.value.push({
+                ...element,
+            });
+        }
+    }
+});
+
+const { copied, copy } = useClipboardMap();
 </script>
 
 <template>
@@ -64,16 +57,20 @@ const forms = [
                 ]"
             >
                 <tr
-                    v-for="form in forms"
+                    v-for="form in items"
                     :key="form.id"
                     class="hover:bg-muted/50 transition-colors"
                 >
                     <td class="px-4 py-4">
                         <div class="font-medium">
-                            {{ form.name }}
+                            <a :href="`/dashboard/form/${form.id}`">
+                                {{ form.name }}
+                            </a>
                         </div>
                         <div class="text-xs text-muted-foreground font-mono">
-                            {{ form.id }}
+                            <a :href="`/dashboard/form/${form.id}`">
+                                {{ form.id }}
+                            </a>
                         </div>
                     </td>
 
@@ -87,42 +84,49 @@ const forms = [
 
                             <button
                                 class="text-muted-foreground hover:text-apple-blue"
+                                @click="copy(form.id, form.endpoint)"
                             >
-                                <Copy :size="14" />
+                                <Check
+                                    v-if="copied[form.id]"
+                                    :size="14"
+                                    class="text-green-500"
+                                />
+                                <Copy v-else :size="14" />
                             </button>
                         </div>
                     </td>
 
                     <td class="px-4 py-4 text-sm font-medium">
-                        {{ form.submissions }}
+                        {{
+                            typeof form.submissions === "number" &&
+                            form.submissions >= 0
+                                ? form.submissions
+                                : ""
+                        }}
                     </td>
 
                     <td class="px-4 py-4">
                         <span
                             :class="[
                                 'text-xs font-bold px-2 py-1 rounded-full',
-                                form.status === 'active'
+                                form.is_active
                                     ? 'bg-emerald-500/10 text-emerald-500'
                                     : 'bg-apple-gray/10 text-apple-gray',
                             ]"
                         >
-                            {{ form.status }}
+                            {{ form.is_active ? "active" : "inactive" }}
                         </span>
                     </td>
 
                     <td class="px-4 py-4">
                         <div class="flex items-center gap-2">
-                            <button
-                                class="p-2 rounded-lg hover:bg-muted text-muted-foreground"
-                            >
-                                <Eye :size="18" />
-                            </button>
-
-                            <button
-                                class="p-2 rounded-lg hover:bg-muted text-muted-foreground"
-                            >
-                                <Edit2 :size="18" />
-                            </button>
+                            <a :href="`/dashboard/form/${form.id}`">
+                                <button
+                                    class="p-2 rounded-lg hover:bg-muted text-muted-foreground"
+                                >
+                                    <Edit2 :size="18" />
+                                </button>
+                            </a>
 
                             <button
                                 class="p-2 rounded-lg hover:bg-muted text-red-500"
