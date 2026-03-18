@@ -6,7 +6,7 @@ import { RefreshCw, Eye, EyeOff, Copy, Check } from "lucide-vue-next";
 import InputField from "../InputField.vue";
 import { useFormError } from "@/composition/useFormError";
 import InputFieldError from "../InputFieldError.vue";
-import { useClipboard, useClipboardMap } from "@/utils/clipboard";
+import { useClipboardMap } from "@/utils/clipboard";
 import FormField from "../FormField.vue";
 import { doFetch } from "@/utils/request";
 
@@ -14,7 +14,7 @@ const props = defineProps<{
     action: string;
     refreshToken: string;
 
-    formId: string;
+    slug: string;
     endpointUrl: string;
     name: string;
     isActive: boolean;

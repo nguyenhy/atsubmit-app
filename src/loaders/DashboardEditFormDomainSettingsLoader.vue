@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import DashboardDomainSettings from "@/components/dashboard/DashboardDomainSettings.vue";
-import DashboardProcessingSettings from "@/components/dashboard/DashboardProcessingSettings.vue";
 import Layout from "@/layouts/AuthedLayout.vue";
 import DashboardEditFormPage from "@/pages/DashboardEditFormPage.vue";
 
 const props = defineProps<{
-    formId: string;
+    slug: string;
     allowed: string[];
     disallowed: string[];
 }>();
@@ -13,9 +12,9 @@ const props = defineProps<{
 
 <template>
     <Layout>
-        <DashboardEditFormPage tab="domains" :form-id="formId">
+        <DashboardEditFormPage tab="domains" :slug="slug">
             <DashboardDomainSettings
-                :action="`/webapi/dashboard/form/${formId}/domains`"
+                :action="`/webapi/dashboard/form/${slug}/domains`"
                 v-bind="props"
             />
         </DashboardEditFormPage>

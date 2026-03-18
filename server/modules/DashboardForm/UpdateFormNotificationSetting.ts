@@ -6,7 +6,7 @@ export const updateFormNotificationSetting = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
         enabled?: boolean;
         via_email?: boolean;
         frequency?: string | null;
@@ -31,7 +31,7 @@ export const updateFormNotificationSetting = async (
             updated_at = now()
         WHERE
             user_id = $1
-            AND id = $2
+            AND endpoint_slug = $2
 
         RETURNING
             notification_enabled,
@@ -41,7 +41,7 @@ export const updateFormNotificationSetting = async (
     `;
     const params = [
         data.user_id,
-        data.id,
+        data.slug,
         !!data.enabled,
         data.frequency ?? null,
         !!data.via_email,

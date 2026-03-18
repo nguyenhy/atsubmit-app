@@ -7,7 +7,7 @@ export const refreshSubmitToken = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
         token: string;
     },
 ) => {
@@ -18,11 +18,11 @@ export const refreshSubmitToken = async (
             , updated_at = now()
         WHERE
 			user_id = $1
-			AND id = $2
+			AND endpoint_slug = $2
 			AND is_active = TRUE
     `;
 
-    const params = [data.user_id, data.id, data.token];
+    const params = [data.user_id, data.slug, data.token];
 
     const result = await lazyPoolExecute(c, async (client) => {
         return client.query<

@@ -57,7 +57,7 @@ export const paginateForm = async (
     return {
         items: rows.map((item) => {
             return {
-                id: item.id,
+                id: item.endpoint_slug,
                 name: item.name,
                 endpoint: `https://api.atsubmit.com/f/${item.endpoint_slug}`,
                 is_active: item.is_active,

@@ -4,7 +4,7 @@ import Layout from "@/layouts/AuthedLayout.vue";
 import DashboardEditFormPage from "@/pages/DashboardEditFormPage.vue";
 
 const props = defineProps<{
-    formId: string;
+    slug: string;
     enabled: boolean;
     name: string;
     hiddenStyle: string;
@@ -16,9 +16,9 @@ const props = defineProps<{
 
 <template>
     <Layout>
-        <DashboardEditFormPage tab="processing" :form-id="formId">
+        <DashboardEditFormPage tab="processing" :slug="slug">
             <DashboardProcessingSettings
-                :action="`/dashboard/form/${formId}/processing`"
+                :action="`/dashboard/form/${slug}/processing`"
                 v-bind="props"
             />
         </DashboardEditFormPage>

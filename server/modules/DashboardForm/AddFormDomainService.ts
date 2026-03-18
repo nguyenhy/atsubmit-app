@@ -6,7 +6,7 @@ export const addFormDomainService = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
         allow?: string;
         disallow?: string;
     },
@@ -49,14 +49,14 @@ export const addFormDomainService = async (
                 END
         WHERE
             user_id = $1
-            AND id = $2
+            AND endpoint_slug = $2
         RETURNING
             allowed_domains,
             disallowed_domains;
 	`;
     const params = [
         data.user_id,
-        data.id,
+        data.slug,
         data.allow || null,
         data.disallow || null,
     ];

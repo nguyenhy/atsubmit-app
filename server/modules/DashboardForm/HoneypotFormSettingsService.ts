@@ -7,7 +7,7 @@ export const getHoneypotFormSetting = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
     },
 ) => {
     const query = `
@@ -19,13 +19,13 @@ export const getHoneypotFormSetting = async (
 		FROM forms
 		WHERE
 			user_id = $1
-			AND id = $2
+			AND endpoint_slug = $2
 		LIMIT 1
 	`;
     const result = await lazyPoolExecute(c, async (client) => {
         return client.query<FormHoneypotSettings>(query, [
             data.user_id,
-            data.id,
+            data.slug,
         ]);
     });
 
@@ -101,7 +101,7 @@ export const updateHoneyPotFormSetting = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
         enabled: boolean;
         name?: string;
         hiddenStyle?: string;
@@ -126,7 +126,7 @@ export const updateHoneyPotFormSetting = async (
 			updated_at = now()
 		WHERE
 			user_id = $1
-			AND id = $2
+			AND endpoint_slug = $2
 			AND (
 				honeypot_enabled 			IS DISTINCT FROM COALESCE($3, honeypot_enabled)
 				OR honeypot_class_name 		IS DISTINCT FROM COALESCE($4, honeypot_class_name)
@@ -137,13 +137,12 @@ export const updateHoneyPotFormSetting = async (
 
     const params = [
         data.user_id,
-        data.id,
+        data.slug,
         !!data.enabled,
         data.hiddenClassName ?? null,
         data.name ?? null,
         data.hiddenStyle ?? null,
     ];
-    console.log(params);
 
     return await lazyPoolExecute(c, async (client) => {
         return client.query(query, params);

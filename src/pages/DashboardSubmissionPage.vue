@@ -151,48 +151,46 @@ onBeforeMount(async () => {
                     :key="sub.id"
                     class="hover:bg-muted/50 transition-colors cursor-pointer"
                 >
-                    <a :href="`/dashboard/submission/${sub.id}`">
-                        <td class="px-4 py-4 font-medium">
-                            {{ sub.form }}
-                        </td>
+                    <td class="px-4 py-4 font-medium">
+                        {{ sub.form }}
+                    </td>
 
-                        <td
-                            class="px-4 py-4 text-sm text-muted-foreground truncate max-w-[300px]"
+                    <td
+                        class="px-4 py-4 text-sm text-muted-foreground truncate max-w-[300px]"
+                    >
+                        {{
+                            Object.entries(sub.data)
+                                .map(([k, v]) => `${k}: ${v}`)
+                                .join(", ")
+                        }}
+                    </td>
+
+                    <td class="px-4 py-4 text-sm text-muted-foreground">
+                        {{ sub.time }}
+                    </td>
+
+                    <td class="px-4 py-4">
+                        <span
+                            v-if="sub.spam"
+                            class="flex items-center gap-1 text-xs font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded-full w-fit"
                         >
-                            {{
-                                Object.entries(sub.data)
-                                    .map(([k, v]) => `${k}: ${v}`)
-                                    .join(", ")
-                            }}
-                        </td>
+                            <Shield :size="12" /> Spam
+                        </span>
+                        <span
+                            v-else
+                            class="flex items-center gap-1 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full w-fit"
+                        >
+                            <Shield :size="12" /> Safe
+                        </span>
+                    </td>
 
-                        <td class="px-4 py-4 text-sm text-muted-foreground">
-                            {{ sub.time }}
-                        </td>
-
-                        <td class="px-4 py-4">
-                            <span
-                                v-if="sub.spam"
-                                class="flex items-center gap-1 text-xs font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded-full w-fit"
-                            >
-                                <Shield :size="12" /> Spam
-                            </span>
-                            <span
-                                v-else
-                                class="flex items-center gap-1 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full w-fit"
-                            >
-                                <Shield :size="12" /> Safe
-                            </span>
-                        </td>
-
-                        <td class="px-4 py-4">
-                            <button
-                                class="p-2 rounded-lg hover:bg-muted text-muted-foreground"
-                            >
-                                <MoreVertical :size="18" />
-                            </button>
-                        </td>
-                    </a>
+                    <td class="px-4 py-4">
+                        <button
+                            class="p-2 rounded-lg hover:bg-muted text-muted-foreground"
+                        >
+                            <MoreVertical :size="18" />
+                        </button>
+                    </td>
                 </tr>
             </Table>
 

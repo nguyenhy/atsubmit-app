@@ -6,7 +6,7 @@ export const getFormDomainService = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
     },
 ) => {
     const query = `
@@ -16,9 +16,9 @@ export const getFormDomainService = async (
         FROM forms
         WHERE
             user_id = $1
-            AND id = $2
+            AND endpoint_slug = $2
     `;
-    const params = [data.user_id, data.id];
+    const params = [data.user_id, data.slug];
     const result = await lazyPoolExecute(c, async (client) => {
         return client.query<FormDomainSettings>(query, params);
     });

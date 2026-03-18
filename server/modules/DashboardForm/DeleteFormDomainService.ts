@@ -6,7 +6,7 @@ export const deleteFormDomainService = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
         allow?: string;
         disallow?: string;
     },
@@ -39,13 +39,18 @@ export const deleteFormDomainService = async (
                 END
         WHERE
             user_id = $1
-            AND id = $2
+            AND endpoint_slug = $2
 
         RETURNING
             allowed_domains,
             disallowed_domains;
 	`;
-    const params = [data.user_id, data.allow || null, data.disallow || null];
+    const params = [
+        data.user_id,
+        data.slug,
+        data.allow || null,
+        data.disallow || null,
+    ];
     const result = await lazyPoolExecute(c, async (client) => {
         return client.query<UserDomainSettings>(query, params);
     });

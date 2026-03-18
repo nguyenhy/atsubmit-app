@@ -10,7 +10,7 @@ import { User, Shield, Globe, Bell } from "lucide-vue-next";
 import { onMounted, useTemplateRef } from "vue";
 
 const props = defineProps<{
-    formId: string;
+    slug: string;
     tab: FormSettingsTabId;
 }>();
 
@@ -19,25 +19,25 @@ const tabs: FormSettingsTab[] = [
     {
         id: "general",
         name: "General",
-        href: `/dashboard/form/${props.formId}/general`,
+        href: `/dashboard/form/${props.slug}/general`,
         icon: User,
     },
     {
         id: "processing",
         name: "Processing",
-        href: `/dashboard/form/${props.formId}/processing`,
+        href: `/dashboard/form/${props.slug}/processing`,
         icon: Shield,
     },
     {
         id: "domains",
         name: "Domains",
-        href: `/dashboard/form/${props.formId}/domains`,
+        href: `/dashboard/form/${props.slug}/domains`,
         icon: Globe,
     },
     {
         id: "notifications",
         name: "Notifications",
-        href: `/dashboard/form/${props.formId}/notifications`,
+        href: `/dashboard/form/${props.slug}/notifications`,
         icon: Bell,
     },
 ];

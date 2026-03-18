@@ -6,12 +6,11 @@ export const getFormGeneralSetting = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
     },
 ) => {
     const query = `
         SELECT
-            id,
             name,
             endpoint_slug,
             is_active,
@@ -21,17 +20,16 @@ export const getFormGeneralSetting = async (
         FROM forms
         WHERE
             user_id = $1
-            AND id = $2
+            AND endpoint_slug = $2
         LIMIT 1
     `;
 
-    const params = [data.user_id, data.id];
+    const params = [data.user_id, data.slug];
 
     const result = await lazyPoolExecute(c, async (client) => {
         return client.query<
             Pick<
                 Form,
-                | "id"
                 | "name"
                 | "endpoint_slug"
                 | "is_active"

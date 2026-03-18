@@ -270,7 +270,7 @@ export const registerWebRoutes = (web: WebHono) => {
     dashboard.get("/", async (c) => {
         return c.html(htmlPage(c, {}));
     });
-    dashboard.get("/form/:id", async (c) => {
+    dashboard.get("/form/:slug", async (c) => {
         const sid = c.get("sid") || "";
         const session = await getSessionService(c, sid);
         if (!session) {
@@ -281,10 +281,10 @@ export const registerWebRoutes = (web: WebHono) => {
             );
         }
 
-        const id = c.req.param("id");
-        return c.redirect(`/dashboard/form/${id || ""}/general`);
+        const slug = c.req.param("slug");
+        return c.redirect(`/dashboard/form/${slug || ""}/general`);
     });
-    dashboard.get("/form/:id/general", async (c) => {
+    dashboard.get("/form/:slug/general", async (c) => {
         const sid = c.get("sid") || "";
         const session = await getSessionService(c, sid);
         if (!session) {
@@ -295,10 +295,10 @@ export const registerWebRoutes = (web: WebHono) => {
             );
         }
 
-        const id = c.req.param("id");
+        const slug = c.req.param("slug");
         const setting = await getFormGeneralSetting(c, {
             user_id: session.user_id,
-            id: id,
+            slug: slug,
         });
         if (!setting) {
             return c.html(
@@ -311,7 +311,7 @@ export const registerWebRoutes = (web: WebHono) => {
         return c.html(
             htmlPage(c, {
                 context: {
-                    formId: id,
+                    slug: slug,
                     endpointUrl: createSubmissionEndpoint(
                         c,
                         setting.endpoint_slug,
@@ -326,7 +326,7 @@ export const registerWebRoutes = (web: WebHono) => {
         );
     });
     dashboard.post(
-        "/form/:id/general",
+        "/form/:slug/general",
         validateFormGeneralSettingService(),
         async (c) => {
             const sid = c.get("sid") || "";
@@ -339,14 +339,12 @@ export const registerWebRoutes = (web: WebHono) => {
                 );
             }
 
-            const id = c.req.param("id");
+            const slug = c.req.param("slug");
             const form = c.req.valid("form");
             if (!form.error) {
-                console.log(form.data);
-
                 await updateFormGeneralSettingService(c, {
                     user_id: session.user_id,
-                    id: id,
+                    slug: slug,
                     ...(form.data.active
                         ? {
                               isActive: true,
@@ -360,7 +358,7 @@ export const registerWebRoutes = (web: WebHono) => {
 
             const setting = await getFormGeneralSetting(c, {
                 user_id: session.user_id,
-                id: id,
+                slug: slug,
             });
             if (!setting) {
                 return c.html(
@@ -373,7 +371,7 @@ export const registerWebRoutes = (web: WebHono) => {
             return c.html(
                 htmlPage(c, {
                     context: {
-                        formId: id,
+                        slug: slug,
                         endpointUrl: createSubmissionEndpoint(
                             c,
                             setting.endpoint_slug,
@@ -391,7 +389,7 @@ export const registerWebRoutes = (web: WebHono) => {
         },
     );
 
-    dashboard.get("/form/:id/processing", async (c) => {
+    dashboard.get("/form/:slug/processing", async (c) => {
         const sid = c.get("sid") || "";
         const session = await getSessionService(c, sid);
         if (!session) {
@@ -402,10 +400,10 @@ export const registerWebRoutes = (web: WebHono) => {
             );
         }
 
-        const formId = c.req.param("id");
+        const slug = c.req.param("slug");
         const setting = await getHoneypotFormSetting(c, {
             user_id: session.user_id,
-            id: formId,
+            slug: slug,
         });
         if (!setting) {
             return c.html(
@@ -418,7 +416,7 @@ export const registerWebRoutes = (web: WebHono) => {
         return c.html(
             htmlPage(c, {
                 context: {
-                    formId: formId,
+                    slug: slug,
                     enabled: !!setting.honeypot_enabled,
                     name: setting.honeypot_input_name || "",
                     hiddenStyle: setting.honeypot_hidden_style || "",
@@ -428,7 +426,7 @@ export const registerWebRoutes = (web: WebHono) => {
         );
     });
     dashboard.post(
-        "/form/:id/processing",
+        "/form/:slug/processing",
         honeypotFormSettingBodyService(),
         async (c) => {
             const sid = c.get("sid") || "";
@@ -441,7 +439,7 @@ export const registerWebRoutes = (web: WebHono) => {
                 );
             }
 
-            const formId = c.req.param("id");
+            const slug = c.req.param("slug");
             const form = c.req.valid("form");
             if (!form.error) {
                 await updateHoneyPotFormSetting(
@@ -449,7 +447,7 @@ export const registerWebRoutes = (web: WebHono) => {
                     !!form.data.enabled
                         ? {
                               user_id: session.user_id,
-                              id: formId,
+                              slug: slug,
 
                               enabled: form.data.enabled,
                               name: form.data.name,
@@ -458,7 +456,7 @@ export const registerWebRoutes = (web: WebHono) => {
                           }
                         : {
                               user_id: session.user_id,
-                              id: formId,
+                              slug: slug,
 
                               enabled: form.data.enabled,
                           },
@@ -467,7 +465,7 @@ export const registerWebRoutes = (web: WebHono) => {
 
             const setting = await getHoneypotFormSetting(c, {
                 user_id: session.user_id,
-                id: formId,
+                slug: slug,
             });
             if (!setting) {
                 return c.html(
@@ -480,7 +478,7 @@ export const registerWebRoutes = (web: WebHono) => {
             return c.html(
                 htmlPage(c, {
                     context: {
-                        formId: formId,
+                        slug: slug,
                         enabled: !!setting.honeypot_enabled,
                         name: setting.honeypot_input_name || "",
                         hiddenStyle: setting.honeypot_hidden_style || "",
@@ -491,7 +489,7 @@ export const registerWebRoutes = (web: WebHono) => {
         },
     );
 
-    dashboard.get("/form/:id/domains", async (c) => {
+    dashboard.get("/form/:slug/domains", async (c) => {
         const sid = c.get("sid") || "";
         const session = await getSessionService(c, sid);
         if (!session) {
@@ -501,15 +499,15 @@ export const registerWebRoutes = (web: WebHono) => {
                 }),
             );
         }
-        const formId = c.req.param("id");
+        const slug = c.req.param("slug");
         const result = await getFormDomainService(c, {
             user_id: session.user_id,
-            id: formId,
+            slug: slug,
         });
         return c.html(
             htmlPage(c, {
                 context: {
-                    formId: formId,
+                    slug: slug,
                     allowed: result?.allowed_domains || [],
                     disallowed: result?.disallowed_domains || [],
                 },
@@ -517,7 +515,7 @@ export const registerWebRoutes = (web: WebHono) => {
         );
     });
 
-    dashboard.get("/form/:id/notifications", async (c) => {
+    dashboard.get("/form/:slug/notifications", async (c) => {
         const sid = c.get("sid") || "";
         const session = await getSessionService(c, sid);
         if (!session) {
@@ -528,16 +526,16 @@ export const registerWebRoutes = (web: WebHono) => {
             );
         }
 
-        const formId = c.req.param("id");
+        const slug = c.req.param("slug");
         const result = await getFormNotificationSetting(c, {
             user_id: session.user_id,
-            id: formId,
+            slug: slug,
         });
         return c.html(
             htmlPage(c, {
                 context: result
                     ? {
-                          formId,
+                          slug: slug,
                           rules: NOTIFICATION_FREQUENT_RULES,
                           enabled: !!result.notification_enabled,
                           method: "email",
@@ -547,7 +545,7 @@ export const registerWebRoutes = (web: WebHono) => {
                               result.notification_email_recipients,
                       }
                     : {
-                          formId,
+                          slug: slug,
                           rules: NOTIFICATION_FREQUENT_RULES,
                           enabled: false,
                       },
@@ -555,7 +553,7 @@ export const registerWebRoutes = (web: WebHono) => {
         );
     });
     dashboard.post(
-        "/form/:id/notifications",
+        "/form/:slug/notifications",
         updateFormNotificationBodyService(),
         async (c) => {
             const sid = c.get("sid") || "";
@@ -568,29 +566,28 @@ export const registerWebRoutes = (web: WebHono) => {
                 );
             }
 
-            const formId = c.req.param("id");
+            const slug = c.req.param("slug");
             const form = await c.req.valid("form");
             if (!form.error) {
-                const result = await updateFormNotificationSetting(c, {
+                await updateFormNotificationSetting(c, {
                     user_id: session.user_id,
-                    id: formId,
+                    slug: slug,
                     enabled: form.data.enabled,
                     via_email: true,
                     frequency: "weekly",
                     email_recipients: form.data["email-recipients"],
                 });
-                console.log("result", result);
             }
 
             const result = await getFormNotificationSetting(c, {
                 user_id: session.user_id,
-                id: formId,
+                slug: slug,
             });
             return c.html(
                 htmlPage(c, {
                     context: result
                         ? {
-                              formId,
+                              slug: slug,
                               rules: NOTIFICATION_FREQUENT_RULES,
                               enabled: !!result.notification_enabled,
                               method: "email",
@@ -600,7 +597,7 @@ export const registerWebRoutes = (web: WebHono) => {
                                   result.notification_email_recipients,
                           }
                         : {
-                              formId,
+                              slug: slug,
                               rules: NOTIFICATION_FREQUENT_RULES,
                               enabled: false,
                           },
@@ -661,7 +658,7 @@ export const registerWebRoutes = (web: WebHono) => {
             slug: slug,
             token: token,
         });
-        console.log('result', result);
+        console.log("result", result);
 
         return c.redirect("/dashboard/forms");
     });
@@ -1002,7 +999,7 @@ export const registerWebApiRoutes = (webApi: WebApiHono) => {
         },
     );
 
-    dashboard.post("/form/:id/submit_token", async (c) => {
+    dashboard.post("/form/:slug/submit_token", async (c) => {
         const sid = c.get("sid") || "";
         const session = await getSessionService(c, sid);
         if (!session) {
@@ -1016,7 +1013,7 @@ export const registerWebApiRoutes = (webApi: WebApiHono) => {
         const token = createRandomToken();
         await refreshSubmitToken(c, {
             user_id: session.user_id,
-            id: c.req.param("id"),
+            slug: c.req.param("slug"),
             token: token,
         });
 
@@ -1026,7 +1023,7 @@ export const registerWebApiRoutes = (webApi: WebApiHono) => {
     });
 
     dashboard.put(
-        "/form/:id/domains",
+        "/form/:slug/domains",
         addFormDomainBodyService(),
         async (c) => {
             const sid = c.get("sid") || "";
@@ -1044,7 +1041,7 @@ export const registerWebApiRoutes = (webApi: WebApiHono) => {
             const disallow = form.disallow;
             const result = await addFormDomainService(c, {
                 user_id: session.user_id,
-                id: c.req.param("id"),
+                slug: c.req.param("slug"),
                 allow: allow,
                 disallow: disallow,
             });
@@ -1055,7 +1052,7 @@ export const registerWebApiRoutes = (webApi: WebApiHono) => {
         },
     );
     dashboard.delete(
-        "/form/:id/domains",
+        "/form/:slug/domains",
         deleteDefaultDomainBodyService(),
         async (c) => {
             const sid = c.get("sid") || "";
@@ -1073,7 +1070,7 @@ export const registerWebApiRoutes = (webApi: WebApiHono) => {
             const disallow = form.disallow;
             const result = await deleteFormDomainService(c, {
                 user_id: session.user_id,
-                id: c.req.param("id"),
+                slug: c.req.param("slug"),
                 allow: allow,
                 disallow: disallow,
             });

@@ -1,13 +1,12 @@
 import { lazyPoolExecute } from "@server/db/pool";
 import { MainContext } from "@server/types";
-import { UserNotificationSettings } from "../Authentication/UserSettings";
 import { FormNotificationSettings } from "../Form";
 
 export const getFormNotificationSetting = async (
     c: MainContext,
     data: {
         user_id: string;
-        id: string;
+        slug: string;
     },
 ) => {
     const query = `
@@ -19,13 +18,13 @@ export const getFormNotificationSetting = async (
 		FROM forms
 		WHERE
 			user_id = $1
-			AND id = $2
+			AND endpoint_slug = $2
 		LIMIT 1
 	`;
     const result = await lazyPoolExecute(c, async (client) => {
         return client.query<FormNotificationSettings>(query, [
             data.user_id,
-            data.id,
+            data.slug,
         ]);
     });
 

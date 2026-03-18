@@ -5,7 +5,7 @@ import Layout from "@/layouts/AuthedLayout.vue";
 import DashboardEditFormPage from "@/pages/DashboardEditFormPage.vue";
 
 const props = defineProps<{
-    formId: string;
+    slug: string;
 
     rules: NotificationFrequentRule[];
 
@@ -19,9 +19,9 @@ const props = defineProps<{
 
 <template>
     <Layout>
-        <DashboardEditFormPage tab='notifications' :form-id="formId">
+        <DashboardEditFormPage tab='notifications' :slug="slug">
             <DashboardNotificationSettings
-                :action="`/dashboard/form/${formId}/notifications`"
+                :action="`/dashboard/form/${slug}/notifications`"
                 v-bind="props"
             />
         </DashboardEditFormPage>

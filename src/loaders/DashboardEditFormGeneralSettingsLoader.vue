@@ -4,7 +4,7 @@ import Layout from "@/layouts/AuthedLayout.vue";
 import DashboardEditFormPage from "@/pages/DashboardEditFormPage.vue";
 
 const props = defineProps<{
-    formId: string;
+    slug: string;
     endpointUrl: string;
     name: string;
     isActive: boolean;
@@ -16,10 +16,10 @@ const props = defineProps<{
 
 <template>
     <Layout>
-        <DashboardEditFormPage tab="general" :form-id="formId">
+        <DashboardEditFormPage tab="general" :slug="slug">
             <DashboardEditFormGeneralSettings
-                :action="`/dashboard/form/${formId}/general`"
-                :refreshToken="`/webapi/dashboard/form/${formId}/submit_token`"
+                :action="`/dashboard/form/${slug}/general`"
+                :refreshToken="`/webapi/dashboard/form/${slug}/submit_token`"
                 v-bind="props"
             />
         </DashboardEditFormPage>
