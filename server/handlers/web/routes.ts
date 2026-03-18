@@ -225,6 +225,9 @@ export const registerWebRoutes = (web: WebHono) => {
         },
     );
 
+    web.get("/reset-password-success", async (c) => {
+        return c.html(htmlPage(c, {}));
+    });
     web.get("/reset-password-used", async (c) => {
         return c.html(htmlPage(c, {}));
     });
