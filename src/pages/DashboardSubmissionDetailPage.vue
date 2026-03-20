@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import DashboardHeader from "@/components/dashboard/DashboardHeader.vue";
 import Card from "@/components/dashboard/Card.vue";
 import {
@@ -12,7 +12,6 @@ import {
     Shield,
 } from "lucide-vue-next";
 import type { Submission } from "./DashboardSubmissionDetailPage.types";
-import Table from "@/components/dashboard/Table.vue";
 
 const props = defineProps<{
     submission: Submission & {
