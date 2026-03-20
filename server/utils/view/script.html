@@ -19,7 +19,7 @@
 	};
 
 	window.onload = async () => {
-		const response = await fetch('/.vite/manifest.json');
+		const response = await fetch('/manifest.json');
 		const json = await response.json();
 		const key = '{{VIEW_NAME}}';
 		const object = json[key] || null;

@@ -8,7 +8,9 @@
 	"compatibility_date": "2026-03-01",
 	"main": "server/index.ts",
 	"assets": {
-		"not_found_handling": "404-page"
+		"not_found_handling": "404-page",
+		"binding": "ASSETS",
+		"directory": "./dist"
 	},
 	"observability": {
 		"enabled": true

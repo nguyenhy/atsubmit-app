@@ -22,4 +22,7 @@ export default defineConfig({
 			'@server': fileURLToPath(new URL('./server', import.meta.url))
 		},
 	},
+    build: {
+        manifest: 'manifest.json',
+    },
 })
