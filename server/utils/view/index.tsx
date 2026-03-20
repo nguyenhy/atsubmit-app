@@ -8,8 +8,6 @@ export interface HTMLPageOptions {
     context?: Record<string, unknown>;
 }
 export const htmlPage = (c: MainContext, options?: HTMLPageOptions) => {
-    console.log(['htmlPage', Object.keys(c.env)]);
-    
     const hmr = c.env.APP_ENV === 'production' ? false : true;
     const httpStatus = options?.httpStatus ?? c.res.status
 
