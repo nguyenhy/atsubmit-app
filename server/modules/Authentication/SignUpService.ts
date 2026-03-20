@@ -23,27 +23,6 @@ export const verifyCanSignUpWithEmail = async (
     return result.rowCount === 0;
 };
 
-export const hasMxRecord = async (domain: string) => {
-    const url = new URL("https://cloudflare-dns.com/dns-query");
-    url.searchParams.set("type", "MX");
-    url.searchParams.set("name", domain);
-
-    const res = await fetch(url.toString(), {
-        headers: {
-            accept: "application/dns-json",
-        },
-    });
-    const data = await res.json();
-
-    return (
-        typeof data === "object" &&
-        !!data &&
-        "Answer" in data &&
-        Array.isArray(data.Answer) &&
-        data.Answer.length > 0
-    );
-};
-
 export const emailSignupService = async (
     c: MainContext,
     credential: {

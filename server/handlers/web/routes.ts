@@ -18,9 +18,13 @@ import {
 import { validateSignUpBodyService } from "@server/modules/Authentication/SignUpBodyService";
 import {
     emailSignupService,
-    hasMxRecord,
     verifyCanSignUpWithEmail,
 } from "@server/modules/Authentication/SignUpService";
+import {
+    hasMxRecord,
+    isDisposableEmailDomain,
+    isReservedEmailDomain,
+} from "@server/modules/Authentication/SignUpDomainService";
 import {
     hasSignUpSuccessCookie,
     resetSignUpSuccessCookie,
@@ -207,20 +211,15 @@ export const registerWebRoutes = (web: WebHono) => {
         async (c) => {
             const form = c.req.valid("form");
             try {
-                const canUse = await verifyCanSignUpWithEmail(c, form.email);
-                if (!canUse) {
-                    return c.html(
-                        htmlPage(c, {
-                            context: {
-                                error: "This email is already registered.",
-                            },
-                        }),
-                    );
-                }
-
                 let valid = false;
                 const domain = form.email.split("@").pop();
-                if (domain) {
+                if (
+                    domain &&
+                    !(
+                        isDisposableEmailDomain(domain) ||
+                        isReservedEmailDomain(domain)
+                    )
+                ) {
                     try {
                         const hasMx = await hasMxRecord(domain);
                         console.log(c.get("reqId"), domain, hasMx);
@@ -244,6 +243,17 @@ export const registerWebRoutes = (web: WebHono) => {
                         htmlPage(c, {
                             context: {
                                 error: 'That email doesn’t look right. Check for missing "@" or typos.',
+                            },
+                        }),
+                    );
+                }
+
+                const canUse = await verifyCanSignUpWithEmail(c, form.email);
+                if (!canUse) {
+                    return c.html(
+                        htmlPage(c, {
+                            context: {
+                                error: "This email is already registered.",
                             },
                         }),
                     );
