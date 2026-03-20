@@ -18,6 +18,7 @@ import {
 import { validateSignUpBodyService } from "@server/modules/Authentication/SignUpBodyService";
 import {
     emailSignupService,
+    hasMxRecord,
     verifyCanSignUpWithEmail,
 } from "@server/modules/Authentication/SignUpService";
 import {
@@ -212,6 +213,37 @@ export const registerWebRoutes = (web: WebHono) => {
                         htmlPage(c, {
                             context: {
                                 error: "This email is already registered.",
+                            },
+                        }),
+                    );
+                }
+
+                let valid = false;
+                const domain = form.email.split("@").pop();
+                if (domain) {
+                    try {
+                        const hasMx = await hasMxRecord(domain);
+                        console.log(c.get("reqId"), domain, hasMx);
+                        if (hasMx) {
+                            valid = true;
+                        }
+                    } catch (error) {
+                        return c.html(
+                            htmlPage(c, {
+                                context: {
+                                    email: form.email,
+                                    error: "Something went wrong. Please try again later.",
+                                },
+                            }),
+                        );
+                    }
+                }
+
+                if (!valid) {
+                    return c.html(
+                        htmlPage(c, {
+                            context: {
+                                error: 'That email doesn’t look right. Check for missing "@" or typos.',
                             },
                         }),
                     );
