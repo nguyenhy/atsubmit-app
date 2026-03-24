@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { contextStorage } from "hono/context-storage";
-import { ApiHono, MainHono, WebApiHono, WebHono } from "@server/types";
+import { ApiHono, MainHono, WebApiHono, WebHono, WebhookHono } from "@server/types";
 import { htmlPage } from "@server/utils/view";
 import {
     registerWebApiRoutes,
@@ -11,6 +11,8 @@ import { registerApiRoutes } from "@server/handlers/api/routes";
 import { setupApiRoutes } from "@server/handlers/api/setup";
 import { setupWebApiRoutes, setupWebRoutes } from "@server/handlers/web/setup";
 import { randomBytes } from "crypto";
+import { registerWebhookRoutes } from "./handlers/webhook/routes";
+import { setupWebhookRoutes } from "./handlers/webhook/setup";
 
 const app: MainHono = new Hono();
 
@@ -54,7 +56,17 @@ api.all("*", async (c) => {
 });
 
 /**
- * 3. RESPONSE VIEW
+ * 3. RESPONSE DATA (JSON) FOR WEBHOOK
+ */
+const webhook: WebhookHono = app.basePath("/webhook");
+setupWebhookRoutes(webhook);
+registerWebhookRoutes(webhook);
+webhook.all("*", async (c) => {
+    return c.json(null, 404);
+});
+
+/**
+ * 4. RESPONSE VIEW
  */
 const web: WebHono = app.basePath("/");
 setupWebRoutes(web);

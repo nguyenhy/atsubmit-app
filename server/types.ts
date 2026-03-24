@@ -43,6 +43,12 @@ export type ApiHono<BasePath extends string = "/api"> = Hono<
     BasePath
 >;
 
+export type WebhookHono<BasePath extends string = "/webhook"> = Hono<
+    MainEnv,
+    MainSchema,
+    BasePath
+>;
+
 export type MainContext<
     P extends string = any,
     I extends Input = object,
