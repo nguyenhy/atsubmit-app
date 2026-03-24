@@ -15,6 +15,7 @@ import {
 } from "lucide-vue-next";
 import Layout from "@/layouts/Base.vue";
 import DarkModeToggler from "@/components/DarkModeToggler.vue";
+import Logo from "@/assets/logo-wave-bg.svg?url&inline";
 
 const isSidebarCollapsed = ref(false);
 const isMobileMenuOpen = ref(false);
@@ -67,12 +68,7 @@ function isParentActive(path: string) {
             class="md:hidden h-16 border-b border-border px-4 flex items-center justify-between sticky top-0 z-50 bg-background"
         >
             <div class="flex items-center gap-2">
-                <div
-                    class="w-8 h-8 bg-apple-blue rounded-lg flex items-center justify-center text-white"
-                >
-                    ✕
-                </div>
-
+                <img class="w-8 h-8" :src="Logo" />
                 <span class="font-bold">AtSubmit</span>
             </div>
 
@@ -98,12 +94,7 @@ function isParentActive(path: string) {
                     href="/dashboard"
                     class="flex items-center gap-2"
                 >
-                    <div
-                        class="w-8 h-8 bg-apple-blue rounded-lg flex items-center justify-center text-white"
-                    >
-                        ✕
-                    </div>
-
+                    <img class="w-8 h-8" :src="Logo" />
                     <span class="font-bold text-lg"> AtSubmit </span>
                 </a>
 
