@@ -72,7 +72,7 @@ const web: WebHono = app.basePath("/");
 setupWebRoutes(web);
 registerWebRoutes(web);
 web.all("*", async (c) => {
-    return c.html(htmlPage(c, { httpStatus: 404 }));
+    return c.html(htmlPage(c, { httpStatus: 404 }), 404);
 });
 
 export default app;
