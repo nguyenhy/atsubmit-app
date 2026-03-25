@@ -3,7 +3,6 @@ import { HTTPException } from "hono/http-exception";
 
 import { WebHono } from "@server/types";
 import { Exception } from "@server/utils/exception";
-import { wantJson } from "@server/utils/request";
 import { htmlPage } from "@server/utils/view";
 
 export const setupWebRoutes = (web: WebHono) => {
@@ -23,16 +22,7 @@ export const setupWebRoutes = (web: WebHono) => {
             console.error(c, "onError.Error", error.stack || error.message);
         }
 
-        const url = new URL(c.req.url);
-        if (
-            url.pathname.startsWith("/api") ||
-            url.pathname.includes("/ssapi/") ||
-            wantJson(c)
-        ) {
-            return c.json({}, status);
-        } else {
-            return c.html(htmlPage(c, { httpStatus: status }), status);
-        }
+        return c.html(htmlPage(c, { httpStatus: status }), status);
     });
 };
 
