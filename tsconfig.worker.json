@@ -8,7 +8,7 @@
     // Include Node.js types and avoid accidentally including other `@types/*` packages.
     "types": [
       "./worker-configuration.d.ts",
-      "vite/client"
+      "vite/client",
     ],
     // Disable emitting output during `vue-tsc --build`, which is used for type-checking only.
     "noEmit": true,
@@ -17,13 +17,13 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-
     "paths": {
-      "@server/*": ["./server/*"]
+      "@server/*": [
+        "./server/*"
+      ]
     },
   },
   "include": [
     "server",
-    "server/modules/.ts"
-  ],
+  ]
 }
