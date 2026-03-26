@@ -1,3 +1,16 @@
+CREATE TABLE email_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    provider TEXT NOT NULL,
+    payload JSONB NOT NULL,
+
+    response_status TEXT,
+    response_body TEXT,
+
+    created_at TIMESTAMP NOT NULL DEFAULT now()
+);
+
+
 CREATE TABLE incoming_webhook_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
@@ -15,11 +28,6 @@ CREATE TABLE incoming_webhook_events (
     processed_at TIMESTAMPTZ
 );
 
--- Deduplication (SNS MessageId)
-CREATE UNIQUE INDEX idx_incoming_webhook_events_unique_external
-ON incoming_webhook_events (provider, external_id)
-WHERE external_id IS NOT NULL;
-
 -- Fast worker query (get pending events)
 CREATE INDEX idx_incoming_webhook_events_status_created
 ON incoming_webhook_events (status, created_at);
@@ -27,3 +35,39 @@ ON incoming_webhook_events (status, created_at);
 -- Optional: filter by provider
 CREATE INDEX idx_incoming_webhook_events_provider
 ON incoming_webhook_events (provider);
+
+CREATE TABLE email_recipients (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    email TEXT NOT NULL,
+    
+    -- multi-tenant ready (optional but recommended)
+    account_id UUID,
+
+    -- provider scope (nullable = global across providers)
+    provider TEXT,
+
+    status TEXT NOT NULL,
+    -- active | bounced | complained | suppressed | invalid
+
+    status_reason TEXT,
+    -- bounce | complaint | suppression | manual | provider_sync
+
+    source TEXT NOT NULL,
+    -- system | webhook | manual | import
+
+    bounce_count INTEGER NOT NULL DEFAULT 0,
+    complaint_count INTEGER NOT NULL DEFAULT 0,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    UNIQUE (email, account_id, provider)
+);
+
+CREATE INDEX idx_email_status
+ON email_recipients(email, status);
+
+CREATE INDEX idx_blocked_email
+ON email_recipients(email)
+WHERE status IN ('complained', 'suppressed', 'invalid');

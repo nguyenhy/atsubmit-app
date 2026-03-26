@@ -2,6 +2,7 @@ import { lazyPoolExecute } from "@server/db/pool";
 import { parseSubmission } from "@server/modules/ApiSubmission/BodyParserService";
 import { sanitizeHeaders } from "@server/modules/ApiSubmission/HeaderParserService";
 import { newSubmissionService } from "@server/modules/ApiSubmission/NewSubmissionService";
+import { sendEmail } from "@server/modules/SendEmail/SendEmailService";
 import { ApiHono } from "@server/types";
 import { getClientIp } from "@server/utils/request";
 import { validateIP } from "@server/utils/validate/ip";
@@ -12,6 +13,12 @@ export const registerApiRoutes = (api: ApiHono) => {
             return client.query<{ now: string }>("SELECT NOW() as now");
         });
         return c.json(result.rows);
+    });
+
+    api.get("bounce", async (c) => {
+        const response = await sendEmail(c, "/mail/send/ses-bounce", {});
+        console.log(response.status, await response.text());
+        return c.json(null, 200);
     });
 
     api.on(["GET", "POST"], "f/:id", async (c) => {
