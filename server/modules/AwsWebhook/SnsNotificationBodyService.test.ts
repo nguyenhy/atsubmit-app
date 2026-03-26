@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SnsSubscriptionConfirmationSchema } from "./SesBounceBodyService";
+import { SnsSubscriptionConfirmationSchema } from "./SnsNotificationBodyService";
 
 describe("SnsSubscriptionConfirmationSchema", () => {
     const confirmPayload = {

@@ -9,7 +9,7 @@ import {
     SnsNotificationPayload,
     SnsSubscriptionConfirmationPayload,
     SnsUnsubscriptionConfirmationPayload,
-} from "@server/modules/AwsWebhook/SesBounceBodyService";
+} from "@server/modules/AwsWebhook/SnsNotificationBodyService";
 
 describe("AWS_SNS", () => {
     const subscribePayload: SnsSubscriptionConfirmationPayload = {
@@ -238,7 +238,8 @@ describe("AWS_SNS", () => {
             env,
         );
 
-        console.log(response.status, await response.text());
+        expect(response.status).toEqual(200);
+        expect(await response.text()).toEqual("null");
         // 1 call
         expect(spySave.mock.calls.length).toStrictEqual(1);
         // 2 params (context, params)

@@ -4,9 +4,22 @@ import {
     SnsSignedPayloadSchema,
     SnsSubscriptionConfirmationSchema,
     SnsUnsubscriptionConfirmationSchema,
+} from "@server/modules/AwsWebhook/SnsNotificationBodyService";
+import {
+    SesEventBounceSchema,
+    SesEventComplaintSchema,
+    SesEventDeliverySchema,
+    SesEventSchema,
+    SesEventSendSchema,
 } from "@server/modules/AwsWebhook/SesBounceBodyService";
+
 import {
     AWS_SNS_WEBHOOK_EVENT_TYPE_NOTIFICATION,
+    AWS_SNS_WEBHOOK_EVENT_TYPE_SES_BOUNCE,
+    AWS_SNS_WEBHOOK_EVENT_TYPE_SES_COMPLAINT,
+    AWS_SNS_WEBHOOK_EVENT_TYPE_SES_DELIVERY,
+    AWS_SNS_WEBHOOK_EVENT_TYPE_SES_SEND,
+    AWS_SNS_WEBHOOK_EVENT_TYPE_SES_UNKNOWN,
     AWS_SNS_WEBHOOK_EVENT_TYPE_SUBSCRIPTION_CONFIRMATION,
     AWS_SNS_WEBHOOK_EVENT_TYPE_UNKNOWN,
     AWS_SNS_WEBHOOK_EVENT_TYPE_UNSUBSCRIPTION_CONFIRMATION,
@@ -27,7 +40,7 @@ export const registerWebhookRoutes = (webhook: WebhookHono) => {
             try {
                 json = JSON.parse(text);
             } catch (error) {
-                console.error(c.get("reqId"), "NOT_JSON");
+                console.error(c.get("reqId"), "NOT_JSON_PARSABLE");
                 return c.json(null, 200);
             }
 
@@ -37,59 +50,120 @@ export const registerWebhookRoutes = (webhook: WebhookHono) => {
             }
 
             const signedPayload = SnsSignedPayloadSchema.safeParse(json);
-            if (!signedPayload.success) {
-                console.error(c.get("reqId"), "NOT_SNS_SIGNED");
-                return c.json(null, 200);
-            }
+            if (signedPayload.success) {
+                const subcribePayload =
+                    SnsSubscriptionConfirmationSchema.safeParse(json);
+                if (subcribePayload.success) {
+                    await saveIncomingWebhookEventService(c, {
+                        provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
+                        event_type:
+                            AWS_SNS_WEBHOOK_EVENT_TYPE_SUBSCRIPTION_CONFIRMATION,
+                        external_id: subcribePayload.data.MessageId,
+                        payload: subcribePayload.data,
+                    });
 
-            const subcribePayload =
-                SnsSubscriptionConfirmationSchema.safeParse(json);
-            if (subcribePayload.success) {
+                    return c.json(null, 200);
+                }
+
+                const unsubcribePayload =
+                    SnsUnsubscriptionConfirmationSchema.safeParse(json);
+                if (unsubcribePayload.success) {
+                    await saveIncomingWebhookEventService(c, {
+                        provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
+                        event_type:
+                            AWS_SNS_WEBHOOK_EVENT_TYPE_UNSUBSCRIPTION_CONFIRMATION,
+                        external_id: unsubcribePayload.data.MessageId,
+                        payload: unsubcribePayload.data,
+                    });
+
+                    return c.json(null, 200);
+                }
+
+                const notificationPayload =
+                    SnsNotificationPayloadSchema.safeParse(json);
+                if (notificationPayload.success) {
+                    await saveIncomingWebhookEventService(c, {
+                        provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
+                        event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_NOTIFICATION,
+                        external_id: notificationPayload.data.MessageId,
+                        payload: notificationPayload.data,
+                    });
+
+                    return c.json(null, 200);
+                }
+
                 await saveIncomingWebhookEventService(c, {
                     provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
-                    event_type:
-                        AWS_SNS_WEBHOOK_EVENT_TYPE_SUBSCRIPTION_CONFIRMATION,
-                    external_id: subcribePayload.data.MessageId,
-                    payload: subcribePayload.data,
+                    event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_UNKNOWN,
+                    external_id: signedPayload.data.MessageId,
+                    payload: json,
                 });
 
                 return c.json(null, 200);
             }
 
-            const unsubcribePayload =
-                SnsUnsubscriptionConfirmationSchema.safeParse(json);
-            if (unsubcribePayload.success) {
+            const sesPayload = SesEventSchema.safeParse(json);
+            if (sesPayload.success) {
+                const sesBouncePayload = SesEventBounceSchema.safeParse(json);
+                if (sesBouncePayload.success) {
+                    await saveIncomingWebhookEventService(c, {
+                        provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
+                        event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_SES_BOUNCE,
+                        external_id: sesBouncePayload.data.mail.messageId,
+                        payload: json,
+                    });
+                    return c.json(null, 200);
+                }
+
+                const sesComplaintPayload =
+                    SesEventComplaintSchema.safeParse(json);
+                if (sesComplaintPayload.success) {
+                    await saveIncomingWebhookEventService(c, {
+                        provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
+                        event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_SES_COMPLAINT,
+                        external_id: sesComplaintPayload.data.mail.messageId,
+                        payload: json,
+                    });
+
+                    return c.json(null, 200);
+                }
+
+                const sesDeliveryPayload =
+                    SesEventDeliverySchema.safeParse(json);
+                if (sesDeliveryPayload.success) {
+                    await saveIncomingWebhookEventService(c, {
+                        provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
+                        event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_SES_DELIVERY,
+                        external_id: sesDeliveryPayload.data.mail.messageId,
+                        payload: json,
+                    });
+
+                    return c.json(null, 200);
+                }
+
+                const sesSendPayload = SesEventSendSchema.safeParse(json);
+                if (sesSendPayload.success) {
+                    await saveIncomingWebhookEventService(c, {
+                        provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
+                        event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_SES_SEND,
+                        external_id: sesSendPayload.data.mail.messageId,
+                        payload: json,
+                    });
+
+                    return c.json(null, 200);
+                }
+
                 await saveIncomingWebhookEventService(c, {
                     provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
-                    event_type:
-                        AWS_SNS_WEBHOOK_EVENT_TYPE_UNSUBSCRIPTION_CONFIRMATION,
-                    external_id: unsubcribePayload.data.MessageId,
-                    payload: unsubcribePayload.data,
+                    event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_SES_UNKNOWN,
+                    external_id: sesPayload.data.mail.messageId,
+                    payload: json,
                 });
 
                 return c.json(null, 200);
             }
 
-            const notificationPayload =
-                SnsNotificationPayloadSchema.safeParse(json);
-            if (notificationPayload.success) {
-                await saveIncomingWebhookEventService(c, {
-                    provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
-                    event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_NOTIFICATION,
-                    external_id: notificationPayload.data.MessageId,
-                    payload: notificationPayload.data,
-                });
-
-                return c.json(null, 200);
-            }
-
-            await saveIncomingWebhookEventService(c, {
-                provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
-                event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_UNKNOWN,
-                external_id: signedPayload.data.MessageId,
-                payload: json,
-            });
-
+            console.error(c.get("reqId"), "NOT_SNS_SIGNED", "NOT_SES_EVENT");
             return c.json(null, 200);
         },
     );

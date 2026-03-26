@@ -23,6 +23,27 @@ export const AWS_SNS_WEBHOOK_EVENT_TYPE_UNSUBSCRIPTION_CONFIRMATION =
 export const AWS_SNS_WEBHOOK_EVENT_TYPE_NOTIFICATION = "notification";
 
 /**
+ * record.provider = 'aws_sns' AND payload.Type = 'ses_bounce'
+ */
+export const AWS_SNS_WEBHOOK_EVENT_TYPE_SES_BOUNCE = "ses_bounce";
+/**
+ * record.provider = 'aws_sns' AND payload.Type = 'ses_complaint'
+ */
+export const AWS_SNS_WEBHOOK_EVENT_TYPE_SES_COMPLAINT = "ses_complaint";
+/**
+ * record.provider = 'aws_sns' AND payload.Type = 'ses_delivery'
+ */
+export const AWS_SNS_WEBHOOK_EVENT_TYPE_SES_DELIVERY = "ses_delivery";
+/**
+ * record.provider = 'aws_sns' AND payload.Type = 'ses_send'
+ */
+export const AWS_SNS_WEBHOOK_EVENT_TYPE_SES_SEND = "ses_send";
+/**
+ * record.provider = 'aws_sns' AND payload.Type is unhandled
+ */
+export const AWS_SNS_WEBHOOK_EVENT_TYPE_SES_UNKNOWN = "ses_unknown";
+
+/**
  * fallback situation for logging the payload, while allow later decision
  * - record.external_id =  null
  */
@@ -44,9 +65,14 @@ export interface IncomingWebhookEvent {
     /**
      * Normalized event type for internal processing.
      * enum:
-     * - "subscription_confirmation": {@link AWS_SNS_WEBHOOK_EVENT_TYPE_SUBSCRIPTION_CONFIRMATION}
-     * - "notification": {@link AWS_SNS_WEBHOOK_EVENT_TYPE_NOTIFICATION}
-     * - "unknown":
+     * - "subscription_confirmation"    : {@link AWS_SNS_WEBHOOK_EVENT_TYPE_SUBSCRIPTION_CONFIRMATION}
+     * - "notification"                 : {@link AWS_SNS_WEBHOOK_EVENT_TYPE_NOTIFICATION}
+     * - "ses_bounce"                   : {@link AWS_SNS_WEBHOOK_EVENT_TYPE_SES_BOUNCE}
+     * - "ses_complaint"                : {@link AWS_SNS_WEBHOOK_EVENT_TYPE_SES_COMPLAINT}
+     * - "ses_delivery"                 : {@link AWS_SNS_WEBHOOK_EVENT_TYPE_SES_DELIVERY}
+     * - "ses_send"                     : {@link AWS_SNS_WEBHOOK_EVENT_TYPE_SES_SEND}
+     * - "ses_unknown"                  : {@link AWS_SNS_WEBHOOK_EVENT_TYPE_SES_UNKNOWN}
+     * - "unknown"                      : {@link AWS_SNS_WEBHOOK_EVENT_TYPE_UNKNOWN}
      */
     event_type: string;
 
