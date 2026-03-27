@@ -61,9 +61,7 @@ CREATE TABLE email_recipients (
     complaint_count INTEGER NOT NULL DEFAULT 0,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-
-    UNIQUE (email, account_id, provider)
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX idx_email_status
@@ -72,3 +70,10 @@ ON email_recipients(email, status);
 CREATE INDEX idx_blocked_email
 ON email_recipients(email)
 WHERE status IN ('complained', 'suppressed', 'invalid');
+
+CREATE UNIQUE INDEX idx_email_recipients_unique
+ON email_recipients (
+    email,
+    account_id,
+    provider
+);
