@@ -42,8 +42,8 @@ CREATE TABLE email_recipients (
 
     email TEXT NOT NULL,
     
-    -- multi-tenant ready (optional but recommended)
-    account_id UUID,
+    -- tenant-id
+    account_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'
 
     -- provider scope (nullable = global across providers)
     provider TEXT NOT NULL,

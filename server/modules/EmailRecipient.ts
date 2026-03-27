@@ -48,8 +48,9 @@ export interface EmailRecipient {
     /**
      * Account / tenant ID (nullable for global scope)
      * Allows isolation between different users/projects
+     * default: `00000000-0000-0000-0000-000000000000`
      */
-    account_id: UUID | null;
+    account_id: UUID;
 
     /**
      * Email provider source
