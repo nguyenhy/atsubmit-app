@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { SnsSignedPayload } from "./SesBounceBodyService";
+import { SnsSignedPayload } from "./SnsNotificationBodyService";
 
 export const isValidAwsSnsSignature = async (message: SnsSignedPayload) => {
     // Extract the certificate URL and signature
