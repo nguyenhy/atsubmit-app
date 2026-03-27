@@ -46,7 +46,7 @@ CREATE TABLE email_recipients (
     account_id UUID,
 
     -- provider scope (nullable = global across providers)
-    provider TEXT,
+    provider TEXT NOT NULL,
 
     status TEXT NOT NULL,
     -- active | bounced | complained | suppressed | invalid

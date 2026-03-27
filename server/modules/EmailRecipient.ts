@@ -55,7 +55,7 @@ export interface EmailRecipient {
      * Email provider source
      * null = global rule (applies to all providers)
      */
-    provider: "aws_ses" | "resend" | "postmark" | null;
+    provider: string;
 
     /**
      * Current status used for send decision
