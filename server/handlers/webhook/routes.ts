@@ -9,6 +9,7 @@ import {
     SesEventBounceSchema,
     SesEventComplaintSchema,
     SesEventDeliverySchema,
+    SesEventRejectSchema,
     SesEventSchema,
     SesEventSendSchema,
 } from "@server/modules/AwsWebhook/SesBounceBodyService";
@@ -18,6 +19,7 @@ import {
     AWS_SNS_WEBHOOK_EVENT_TYPE_SES_BOUNCE,
     AWS_SNS_WEBHOOK_EVENT_TYPE_SES_COMPLAINT,
     AWS_SNS_WEBHOOK_EVENT_TYPE_SES_DELIVERY,
+    AWS_SNS_WEBHOOK_EVENT_TYPE_SES_REJECT,
     AWS_SNS_WEBHOOK_EVENT_TYPE_SES_SEND,
     AWS_SNS_WEBHOOK_EVENT_TYPE_SES_UNKNOWN,
     AWS_SNS_WEBHOOK_EVENT_TYPE_SUBSCRIPTION_CONFIRMATION,
@@ -147,6 +149,18 @@ export const registerWebhookRoutes = (webhook: WebhookHono) => {
                         provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
                         event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_SES_SEND,
                         external_id: sesSendPayload.data.mail.messageId,
+                        payload: json,
+                    });
+
+                    return c.json(null, 200);
+                }
+
+                const sesRejectPayload = SesEventRejectSchema.safeParse(json);
+                if (sesRejectPayload.success) {
+                    await saveIncomingWebhookEventService(c, {
+                        provider: INCOMING_WEBHOOK_EVENT_PROVIDER_AWS_SNS,
+                        event_type: AWS_SNS_WEBHOOK_EVENT_TYPE_SES_REJECT,
+                        external_id: sesRejectPayload.data.mail.messageId,
                         payload: json,
                     });
 

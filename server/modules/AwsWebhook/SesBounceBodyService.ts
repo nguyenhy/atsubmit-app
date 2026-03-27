@@ -1,6 +1,7 @@
 import z from "zod";
 
 /**
+ * https://docs.aws.amazon.com/ses/latest/dg/event-publishing-retrieving-sns-contents.html#event-publishing-retrieving-sns-contents-mail-object
  * Base shared mail structure
  */
 export interface SesMail {
@@ -167,6 +168,15 @@ export interface SesComplaintEvent {
 }
 
 /**
+ * REJECT
+ */
+export interface SesRejectEvent {
+    eventType: "Reject";
+    mail: SesMail;
+    reject: { reason: string };
+}
+
+/**
  * Base mail (only what you actually need)
  */
 export const MailSchema = z.object({
@@ -229,10 +239,21 @@ export const SesEventSendSchema = z.object({
 });
 
 /**
+ * Reject
+ */
+export const SesEventRejectSchema = z.object({
+    eventType: z.literal("Reject"),
+    mail: MailSchema,
+    reject: z.object({
+        reason: z.string(),
+    }),
+});
+
+/**
  * Union
  */
 export const SesEventSchema = z.object({
-    eventType: z.enum(["Send", "Delivery", "Bounce", "Complaint"]),
+    eventType: z.enum(["Send", "Delivery", "Bounce", "Complaint", "Reject"]),
     mail: MailSchema,
     bounce: z.object().optional(),
     complaint: z.object().optional(),
