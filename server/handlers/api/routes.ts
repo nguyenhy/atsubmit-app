@@ -15,12 +15,6 @@ export const registerApiRoutes = (api: ApiHono) => {
         return c.json(result.rows);
     });
 
-    api.get("bounce", async (c) => {
-        const response = await sendEmail(c, "/mail/send/ses-bounce", {});
-        console.log(response.status, await response.text());
-        return c.json(null, 200);
-    });
-
     api.on(["GET", "POST"], "f/:id", async (c) => {
         const rawBody = await c.req.raw.clone().text();
         const data = await parseSubmission(c);
