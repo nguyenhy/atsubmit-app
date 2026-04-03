@@ -5,7 +5,7 @@ export const sendEmailSignupVerification = async (
     c: MainContext,
     data: { link: string; send_to: string },
 ) => {
-    return sendEmail(c, "/mail/send/ses-bounce", {
+    return sendEmail(c, "/mail/send/signup-verify", {
         link: data.link,
         send_to: data.send_to,
     });
