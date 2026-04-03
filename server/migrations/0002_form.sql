@@ -36,8 +36,8 @@ CREATE TABLE forms (
     -- state
     is_active BOOLEAN DEFAULT TRUE,
 
-    created_at TIMESTAMP NOT NULL DEFAULT now(),
-    updated_at TIMESTAMP NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 
 );
 
@@ -63,9 +63,9 @@ CREATE TABLE submissions (
 
 	spam_score int2 DEFAULT 0 NOT NULL,
 	spam_reasons _text NULL,
-	spam_checked_at timestamp NULL,
+	spam_checked_at TIMESTAMPTZ NULL,
 
-    created_at timestamp DEFAULT now() NOT NULL
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
 CREATE INDEX idx_submissions_form

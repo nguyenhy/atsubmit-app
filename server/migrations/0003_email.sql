@@ -11,7 +11,7 @@ CREATE TABLE email_logs (
     response_status TEXT,
     response_body TEXT,
 
-    created_at TIMESTAMP NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 

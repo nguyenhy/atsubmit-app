@@ -21,11 +21,11 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     email_verified BOOLEAN DEFAULT FALSE,
 
-    deleted_at TIMESTAMP,
-    scheduled_purge_at TIMESTAMP,
+    deleted_at TIMESTAMPTZ,
+    scheduled_purge_at TIMESTAMPTZ,
 
-    created_at TIMESTAMP NOT NULL DEFAULT now(),
-    updated_at TIMESTAMP NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 
 );
 
@@ -49,8 +49,8 @@ CREATE TABLE auth_identities (
 
     password_hash TEXT,
 
-    created_at TIMESTAMP NOT NULL DEFAULT now(),
-    updated_at TIMESTAMP NOT NULL DEFAULT now(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
 
     CONSTRAINT unique_provider_identity
     UNIQUE(provider, provider_user_id)
@@ -74,11 +74,11 @@ CREATE TABLE password_reset_tokens (
 
     token_hash TEXT NOT NULL,
 
-    expires_at TIMESTAMP NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
 
-    used_at TIMESTAMP,
+    used_at TIMESTAMPTZ,
 
-    created_at TIMESTAMP NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX idx_reset_user
@@ -104,8 +104,8 @@ CREATE TABLE email_verification_tokens (
 
     token TEXT UNIQUE NOT NULL,
 
-    expires_at TIMESTAMP NOT NULL,
-    used_at TIMESTAMP,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used_at TIMESTAMPTZ,
 
-    created_at TIMESTAMP DEFAULT now()
+    created_at TIMESTAMPTZ DEFAULT now()
 );
